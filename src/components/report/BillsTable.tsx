@@ -35,7 +35,15 @@ export function BillsTable({ bills, showRiskOnly = false }: BillsTableProps) {
         </thead>
         <tbody className="divide-y divide-border">
           {filteredBills.map((bill) => (
-            <tr key={bill.id} className="hover:bg-secondary/50 transition-colors">
+            <tr 
+              key={bill.id} 
+              className={`transition-colors ${bill.documentLink ? 'cursor-pointer hover:bg-secondary/50' : 'hover:bg-secondary/50'}`}
+              onClick={() => {
+                if (bill.documentLink) {
+                  window.open(bill.documentLink, '_blank', 'noopener,noreferrer');
+                }
+              }}
+            >
               <td className="px-4 py-3 text-sm text-foreground">{bill.date}</td>
               <td className="px-4 py-3 text-sm text-foreground">{bill.provider}</td>
               <td className="px-4 py-3 text-sm text-foreground">

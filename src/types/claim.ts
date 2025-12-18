@@ -46,6 +46,7 @@ export interface BillItem {
   hasMatchingTreatment: boolean;
   isDuplicate: boolean;
   riskScore: 'high' | 'medium' | 'low';
+  documentLink?: string;
 }
 
 export interface ReportSection {

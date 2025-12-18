@@ -42,7 +42,7 @@ const lukeFrazzaMissingFlags = [
 ];
 
 const lukeFrazzaBills = [
-  { id: '1', date: '2005-04-26', provider: 'Washington Hospital Center', description: 'L3-L4 Discectomy - Facility', amount: 19028, category: 'Surgery', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
+  { id: '1', date: '2006-04-13', provider: 'Inova Fairfax Hospital', description: 'L3-L4 Surgery Charges', amount: 8178.05, category: 'Surgery', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const, documentLink: '/Inova Fairfax Hospital Statement.html' },
   { id: '2', date: '2006-06-29', provider: 'Virginia Hospital Center', description: '360° Revision Fusion', amount: 15863.84, category: 'Surgery', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
   { id: '3', date: '2004-02-04', provider: 'Inova Fairfax', description: 'FESS Sinus Surgery', amount: 8178.05, category: 'Surgery', isAccidentRelated: false, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'high' as const },
   { id: '4', date: '2005-04-11', provider: 'Radiology Associates', description: 'MRI Lumbar Spine', amount: 2400, category: 'Imaging', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },

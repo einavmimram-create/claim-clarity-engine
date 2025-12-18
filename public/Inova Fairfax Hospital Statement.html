@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23808080'/></svg>" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elyon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Times New Roman', serif;
+            line-height: 1.4;
+            color: #000;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .statement-container {
+            max-width: 8.5in;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 0.75in;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-text {
+            font-size: 18pt;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .hospital-name {
+            font-size: 16pt;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            text-transform: uppercase;
+        }
+        .document-title {
+            font-size: 14pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .header-info {
+            text-align: right;
+            font-size: 10pt;
+        }
+        .patient-info {
+            margin-bottom: 30px;
+        }
+        .info-section {
+            margin-bottom: 20px;
+        }
+        .info-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            margin-left: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 10pt;
+        }
+        th {
+            background-color: #f0f0f0;
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            border: 1px solid #000;
+            padding: 8px;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .summary-section {
+            margin-top: 30px;
+            border-top: 2px solid #000;
+            padding-top: 15px;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 11pt;
+        }
+        .summary-label {
+            font-weight: bold;
+        }
+        .summary-value {
+            text-align: right;
+        }
+        .negative {
+            color: #000;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 9pt;
+        }
+        .footer-section {
+            margin-bottom: 20px;
+        }
+        .footer-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="statement-container">
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo-text">INOVA HEALTH SYSTEM</div>
+            </div>
+            <div class="header-info">
+                <div>2990 Telestar Court</div>
+                <div>Falls Church, Virginia 22042-1207</div>
+                <div style="margin-top: 10px;">04/13/06 09:22</div>
+                <div>PAGE 1</div>
+            </div>
+        </div>
+
+        <div class="hospital-name">INOVA FAIRFAX HOSPITAL</div>
+        <div class="document-title">PATIENT STATEMENT OF ACCOUNT - SUMMARY</div>
+
+        <div class="patient-info">
+            <div class="info-section">
+                <div class="info-label">Account Number:</div>
+                <div class="info-value">001668048-4020</div>
+            </div>
+            <div class="info-section">
+                <div class="info-label">Posting Period:</div>
+                <div class="info-value">01/22/04 04/13/06</div>
+            </div>
+            <div class="info-section">
+                <div class="info-label">Patient Name:</div>
+                <div class="info-value">FRAZZA, LUKE</div>
+            </div>
+            <div class="info-section">
+                <div class="info-label">Bill To:</div>
+                <div class="info-value">
+                    <div>LUKE FRAZZA</div>
+                    <div>9528 STEVENBROOK RD</div>
+                    <div>FAIRFAX, VA 220320000</div>
+                    <div>UNITED STATES</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <div class="info-label" style="margin-bottom: 15px;">Patient Services Provided:</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service Code</th>
+                        <th>Description</th>
+                        <th class="text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0250</td>
+                        <td>PHARMACY</td>
+                        <td class="text-right">408.15</td>
+                    </tr>
+                    <tr>
+                        <td>0258</td>
+                        <td>IV SOLUTIONS</td>
+                        <td class="text-right">51.85</td>
+                    </tr>
+                    <tr>
+                        <td>0259</td>
+                        <td>DRUGS/OTHER</td>
+                        <td class="text-right">35.85</td>
+                    </tr>
+                    <tr>
+                        <td>0270</td>
+                        <td>MED-SUR SUPPLIES</td>
+                        <td class="text-right">0.70</td>
+                    </tr>
+                    <tr>
+                        <td>0271</td>
+                        <td>NON-STERILE SUPPLY</td>
+                        <td class="text-right">121.00</td>
+                    </tr>
+                    <tr>
+                        <td>0272</td>
+                        <td>STERILE SUPPLY</td>
+                        <td class="text-right">660.00</td>
+                    </tr>
+                    <tr>
+                        <td>0305</td>
+                        <td>LAB/HEMATOLOGY</td>
+                        <td class="text-right">57.00</td>
+                    </tr>
+                    <tr>
+                        <td>0307</td>
+                        <td>LAB/UROLOGY</td>
+                        <td class="text-right">14.00</td>
+                    </tr>
+                    <tr>
+                        <td>0312</td>
+                        <td>PATHOL/HYSTOL</td>
+                        <td class="text-right">223.00</td>
+                    </tr>
+                    <tr>
+                        <td>0360</td>
+                        <td>OR SERVICES</td>
+                        <td class="text-right">4,502.00</td>
+                    </tr>
+                    <tr>
+                        <td>0370</td>
+                        <td>ANESTHESIA</td>
+                        <td class="text-right">1,278.50</td>
+                    </tr>
+                    <tr>
+                        <td>0710</td>
+                        <td>RECOVERY ROOM</td>
+                        <td class="text-right">826.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="summary-section">
+            <div class="summary-row">
+                <span class="summary-label">SUBTOTAL OF SERVICES:</span>
+                <span class="summary-value">8,178.05</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">INSURANCE PAYMENTS/ADJUSTMENTS:</span>
+                <span class="summary-value negative">8,178.05-</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">AMOUNT PAID BY PATIENT:</span>
+                <span class="summary-value">0.00</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">OTHER ADJUSTMENTS:</span>
+                <span class="summary-value">0.00</span>
+            </div>
+            <div class="summary-row" style="border-top: 1px solid #000; padding-top: 10px; margin-top: 10px; font-weight: bold;">
+                <span class="summary-label">TOTAL ACTIVITY FOR PERIOD:</span>
+                <span class="summary-value">0.00</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-section">
+                <div class="footer-title">REMIT TO:</div>
+                <div>INOVA FAIRFAX HOSPITAL</div>
+                <div>P.O. BOX 37019</div>
+                <div>BALTIMORE, MD 21297-3019</div>
+            </div>
+
+            <div class="footer-section">
+                <div class="footer-title">Balance Details:</div>
+                <div class="summary-row">
+                    <span>BALANCE AS OF 01/22/04:</span>
+                    <span class="text-right">0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>CHARGES:</span>
+                    <span class="text-right">8,178.05</span>
+                </div>
+                <div class="summary-row">
+                    <span>PAYMENTS/ADJUSTMENTS:</span>
+                    <span class="text-right">8,178.05-</span>
+                </div>
+                <div class="summary-row">
+                    <span>BALANCE AS OF 04/13/06:</span>
+                    <span class="text-right">0.00</span>
+                </div>
+                <div class="summary-row" style="font-weight: bold; margin-top: 10px;">
+                    <span>CURRENT ACCOUNT BALANCE:</span>
+                    <span class="text-right">0.00</span>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <div class="footer-title">MAKE CHECK PAYABLE TO:</div>
+                <div>INOVA FAIRFAX HOSPITAL</div>
+            </div>
+
+            <div class="footer-section">
+                <div class="footer-title">QUESTIONS/CONTACT:</div>
+                <div>M-TH 8-4PM F 8-3PM</div>
+                <div>PHONE: (703) 321-2999</div>
+            </div>
+
+            <div style="margin-top: 20px; font-size: 8pt; color: #666;">
+                Reference: Inova Hosp Bills-001
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
