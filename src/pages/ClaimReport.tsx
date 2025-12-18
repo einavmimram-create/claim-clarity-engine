@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Edit3 } from 'lucide-react';
+import { ArrowLeft, Edit3, Plus, Save, X } from 'lucide-react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { ReportTableOfContents } from '@/components/report/ReportTableOfContents';
 import { ReportSection } from '@/components/report/ReportSection';
@@ -11,40 +11,73 @@ import { BillsTable } from '@/components/report/BillsTable';
 import { ConfidenceIndicator } from '@/components/report/ConfidenceIndicator';
 import { EvidenceLink } from '@/components/report/EvidenceLink';
 import { ExportMenu } from '@/components/report/ExportMenu';
+import { AddDocumentsModal } from '@/components/claims/AddDocumentsModal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  mockClaims,
-  mockMedicalTimeline,
-  mockContradictions,
-  mockMissingFlags,
-  mockBills,
-} from '@/data/mockClaims';
+import { toast } from '@/hooks/use-toast';
+import { mockClaims } from '@/data/mockClaims';
+
+// Luke Frazza case data
+const lukeFrazzaTimeline = [
+  { id: '1', date: '2000-06-12', provider: 'Emergency Room', specialty: 'Emergency Medicine', eventType: 'ER Visit', description: 'Emergency treatment for kidney stones', sourceDocument: 'ER Records', sourcePageRef: 'ER-001' },
+  { id: '2', date: '2003-06-18', provider: 'Primary Care', specialty: 'Internal Medicine', eventType: 'Office Visit', description: 'Acute lumbosacral strain; resolved', sourceDocument: 'PCP Records', sourcePageRef: 'PCP-001' },
+  { id: '3', date: '2004-01-21', provider: 'Rheumatology', specialty: 'Rheumatology', eventType: 'Evaluation', description: 'Osteoarthritis evaluation (finger)', sourceDocument: 'Rheum Records', sourcePageRef: 'RH-001' },
+  { id: '4', date: '2004-02-04', provider: 'ENT Surgery', specialty: 'Otolaryngology', eventType: 'Surgery', description: 'Sinus surgery (FESS)', sourceDocument: 'Surgical Records', sourcePageRef: 'ENT-001' },
+  { id: '5', date: '2005-01-23', provider: 'White House Medical', specialty: 'Occupational', eventType: 'Accident', description: 'Index accident – slip-and-fall on wet floor', sourceDocument: 'Incident Report', sourcePageRef: 'INC-001' },
+  { id: '6', date: '2005-02-16', provider: 'Orthopedics', specialty: 'Orthopedic Surgery', eventType: 'Evaluation', description: 'Initial post-accident evaluation', sourceDocument: 'Ortho Records', sourcePageRef: 'OR-001' },
+  { id: '7', date: '2005-04-11', provider: 'Imaging Center', specialty: 'Radiology', eventType: 'MRI', description: 'MRI confirms extruded L3-L4 disc', sourceDocument: 'MRI Report', sourcePageRef: 'MRI-001' },
+  { id: '8', date: '2005-04-26', provider: 'Spine Surgery Center', specialty: 'Neurosurgery', eventType: 'Surgery', description: 'L3-L4 discectomy', sourceDocument: 'Surgical Records', sourcePageRef: 'SS-001' },
+  { id: '9', date: '2006-01-16', provider: 'Imaging Center', specialty: 'Radiology', eventType: 'MRI', description: 'Post-op MRI shows recurrence', sourceDocument: 'MRI Report', sourcePageRef: 'MRI-002' },
+  { id: '10', date: '2006-06-29', provider: 'Spine Surgery Center', specialty: 'Neurosurgery', eventType: 'Surgery', description: 'Revision fusion with instrumentation', sourceDocument: 'Surgical Records', sourcePageRef: 'SS-002' },
+];
+
+const lukeFrazzaContradictions = [
+  { id: '1', type: 'narrative_vs_records' as const, description: 'Prior History Reporting: 2003 severe back strain not disclosed in early 2005 notes', sources: ['2003 PCP Records', '2005 Ortho Intake'], severity: 'high' as const },
+  { id: '2', type: 'diagnosis' as const, description: 'Initial Diagnosis Divergence: Early focus on hip tendinitis despite classic disc symptoms', sources: ['Initial Ortho Notes', 'MRI Findings'], severity: 'medium' as const },
+];
+
+const lukeFrazzaMissingFlags = [
+  { id: '1', type: 'documentation_gap' as const, description: 'Primary Care Records: 2003–2005 records from Dr. Terlinsky', significance: 'Critical for establishing pre-existing condition baseline' },
+  { id: '2', type: 'documentation_gap' as const, description: 'PT Logs: Detailed therapy notes (only summaries available)', significance: 'Needed to verify treatment progression and outcomes' },
+];
+
+const lukeFrazzaBills = [
+  { id: '1', date: '2005-04-26', provider: 'Washington Hospital Center', description: 'L3-L4 Discectomy - Facility', amount: 19028, category: 'Surgery', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
+  { id: '2', date: '2006-06-29', provider: 'Virginia Hospital Center', description: '360° Revision Fusion', amount: 15863.84, category: 'Surgery', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
+  { id: '3', date: '2004-02-04', provider: 'Inova Fairfax', description: 'FESS Sinus Surgery', amount: 8178.05, category: 'Surgery', isAccidentRelated: false, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'high' as const },
+  { id: '4', date: '2005-04-11', provider: 'Radiology Associates', description: 'MRI Lumbar Spine', amount: 2400, category: 'Imaging', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
+  { id: '5', date: '2005-04-11', provider: 'Radiology Associates', description: 'MRI Lumbar Spine', amount: 2400, category: 'Imaging', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: true, riskScore: 'high' as const },
+  { id: '6', date: '2005-02-16', provider: 'Orthopedic Associates', description: 'Initial Evaluation - Misc coded', amount: 345, category: 'Office Visit', isAccidentRelated: true, hasMatchingTreatment: false, isDuplicate: false, riskScore: 'medium' as const },
+  { id: '7', date: '2005-03-15', provider: 'CVS Pharmacy', description: 'Pain Medication', amount: 312.88, category: 'Pharmacy', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
+  { id: '8', date: '2005-03-15', provider: 'CVS Pharmacy', description: 'Pain Medication', amount: 312.88, category: 'Pharmacy', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: true, riskScore: 'high' as const },
+  { id: '9', date: '2006-01-16', provider: 'Imaging Center', description: 'Post-op MRI', amount: 1132.12, category: 'Imaging', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
+];
 
 export default function ClaimReport() {
   const { id } = useParams();
   const [activeSection, setActiveSection] = useState('executive-summary');
+  const [isEditing, setIsEditing] = useState(false);
+  const [showAddDocs, setShowAddDocs] = useState(false);
+  const [documentCount, setDocumentCount] = useState(47);
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
 
   const claim = mockClaims.find((c) => c.id === id) || mockClaims[0];
 
-  const totalBilled = mockBills.reduce((sum, b) => sum + b.amount, 0);
-  const accidentRelatedBilled = mockBills
-    .filter((b) => b.isAccidentRelated)
-    .reduce((sum, b) => sum + b.amount, 0);
-  const leakageAmount = totalBilled - accidentRelatedBilled;
+  const accidentRelatedBilled = 41449.72;
+  const unrelatedBilled = 8523.05;
+  const totalBilled = 49972.77;
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      minimumFractionDigits: 0,
+      minimumFractionDigits: 2,
     }).format(amount);
   };
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100;
+      const scrollPosition = window.scrollY + 160;
 
       for (const [sectionId, ref] of Object.entries(sectionRefs.current)) {
         if (ref) {
@@ -69,12 +102,28 @@ export default function ClaimReport() {
     }
   };
 
+  const handleDocumentsAdded = (count: number) => {
+    setDocumentCount((prev) => prev + count);
+    toast({
+      title: `${count} documents added`,
+      description: 'Re-analyzing report with new documents...',
+    });
+  };
+
+  const handleSave = () => {
+    setIsEditing(false);
+    toast({
+      title: 'Report saved',
+      description: 'Your changes have been saved successfully.',
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <AppHeader />
 
-      {/* Claim Header */}
-      <div className="border-b border-border bg-card">
+      {/* Sticky Claim Header */}
+      <div className="sticky top-0 z-40 border-b border-border bg-card shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -87,22 +136,45 @@ export default function ClaimReport() {
               <div>
                 <div className="flex items-center gap-3">
                   <h1 className="text-xl font-semibold text-foreground">
-                    {claim.name}
+                    Medical and Billing Analysis Report: Luke Frazza
                   </h1>
                   <Badge variant="ready">Ready</Badge>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Accident Date: {claim.accidentDate} • {claim.fileCount} documents
-                  analyzed
-                </p>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>Accident Date: 2005-01-23</span>
+                  <span>•</span>
+                  <span>{documentCount} documents analyzed</span>
+                  <button
+                    onClick={() => setShowAddDocs(true)}
+                    className="ml-1 p-1 hover:bg-secondary rounded transition-colors"
+                    title="Add documents"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="outline" className="gap-2">
-                <Edit3 className="w-4 h-4" />
-                Edit Report
-              </Button>
-              <ExportMenu />
+              {isEditing ? (
+                <>
+                  <Button variant="outline" className="gap-2" onClick={() => setIsEditing(false)}>
+                    <X className="w-4 h-4" />
+                    Cancel
+                  </Button>
+                  <Button className="gap-2" onClick={handleSave}>
+                    <Save className="w-4 h-4" />
+                    Save Changes
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" className="gap-2" onClick={() => setIsEditing(true)}>
+                    <Edit3 className="w-4 h-4" />
+                    Edit Report
+                  </Button>
+                  <ExportMenu />
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -117,80 +189,30 @@ export default function ClaimReport() {
           />
 
           <div className="flex-1 max-w-4xl">
-            <div className="bg-report-bg rounded-xl border border-border p-8 shadow-card">
+            <div className={`bg-report-bg rounded-xl border border-border p-8 shadow-card ${isEditing ? 'ring-2 ring-primary/20' : ''}`}>
+              {isEditing && (
+                <div className="mb-6 p-3 bg-primary/5 border border-primary/20 rounded-lg text-sm text-foreground">
+                  <strong>Edit Mode:</strong> Click on any text to edit. Changes are saved when you click "Save Changes".
+                </div>
+              )}
+
               {/* Executive Summary */}
               <ReportSection
                 ref={(el) => (sectionRefs.current['executive-summary'] = el)}
                 id="executive-summary"
                 title="Executive Summary"
               >
-                <div className="bg-report-highlight rounded-lg p-6 mb-6">
-                  <h3 className="font-semibold text-foreground mb-3">
-                    Key Findings
-                  </h3>
-                  <ul className="space-y-2 text-foreground/90">
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary font-bold">•</span>
-                      <span>
-                        Claimant sustained cervical and lumbar strains from June
-                        2023 bus collision with documented progression to disc
-                        herniation
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary font-bold">•</span>
-                      <span>
-                        Treatment escalated from conservative care to
-                        interventional procedures within 3 months
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary font-bold">•</span>
-                      <span>
-                        Total billed: {formatCurrency(totalBilled)} •
-                        Accident-attributable: {formatCurrency(accidentRelatedBilled)}
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-destructive font-bold">•</span>
-                      <span>
-                        Identified {formatCurrency(leakageAmount)} in potentially
-                        unrelated or unsupported charges
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-
-                <p className="mb-4">
-                  On June 15, 2023, the claimant was involved in a bus collision
-                  while a passenger on a Metro Transit Authority vehicle. Initial
-                  emergency room evaluation diagnosed cervical and lumbar strains
-                  with negative imaging for fractures. The claimant underwent
-                  conservative treatment including physical therapy before
-                  escalating to pain management interventions.
+                <p className={`mb-4 ${isEditing ? 'border border-dashed border-border p-2 rounded hover:border-primary cursor-text' : ''}`} contentEditable={isEditing} suppressContentEditableWarning>
+                  This report provides a comprehensive analysis of the medical treatment and associated costs for Luke Frazza following a slip-and-fall accident on January 23, 2005. The claimant, a professional photographer, suffered an acute L3-L4 disc herniation with an extruded fragment. His clinical course included a failed initial discectomy in April 2005, leading to a complex 360-degree revision fusion in June 2006.
                 </p>
 
-                <p className="mb-4">
-                  MRI imaging obtained approximately 6 weeks post-accident revealed
-                  a C5-6 disc herniation with mild cord compression. This finding,
-                  combined with continued symptoms, led to cervical epidural
-                  steroid injection and eventual surgical consultation.
-                </p>
-
-                <p>
-                  <strong>Causation Assessment:</strong> Mixed confidence in
-                  accident-to-injury causation. While initial soft tissue injuries
-                  are clearly accident-related, the progression to disc pathology
-                  lacks documented mechanism and may involve pre-existing
-                  degeneration.
+                <p className={`mb-4 ${isEditing ? 'border border-dashed border-border p-2 rounded hover:border-primary cursor-text' : ''}`} contentEditable={isEditing} suppressContentEditableWarning>
+                  While the claimant had a prior history of a lumbosacral strain in 2003 and unrelated sinus surgery in 2004, the clinical evidence supports the 2005 fall as the primary cause of his structural spinal injury. The total reviewed billing is {formatCurrency(totalBilled)}, with {formatCurrency(accidentRelatedBilled)} deemed accident-related and {formatCurrency(unrelatedBilled)} identified as unrelated to the trauma.
                 </p>
 
                 <div className="mt-4 flex gap-2">
-                  <EvidenceLink
-                    source="Metro General ER Records"
-                    pageRef="MG-001"
-                  />
-                  <EvidenceLink source="MRI Report" pageRef="MI-001" />
+                  <EvidenceLink source="Incident Report" pageRef="INC-001" />
+                  <EvidenceLink source="MRI Report" pageRef="MRI-001" />
                 </div>
               </ReportSection>
 
@@ -200,35 +222,13 @@ export default function ClaimReport() {
                 id="medical-narrative"
                 title="Medical Narrative"
               >
-                <p className="mb-4">
-                  The claimant, a 42-year-old male with no documented prior
-                  cervical or lumbar complaints, was seated on a Metro Transit bus
-                  when it was rear-ended by a commercial vehicle. He reports
-                  immediate onset of neck pain, back pain, and headache at the
-                  scene.
+                <h3 className="font-semibold text-foreground mb-3">Claimant Medical Summary</h3>
+                <p className={`mb-4 ${isEditing ? 'border border-dashed border-border p-2 rounded hover:border-primary cursor-text' : ''}`} contentEditable={isEditing} suppressContentEditableWarning>
+                  Luke Frazza is a 41-year-old male who sustained a significant lumbar injury while working at the White House. Following a fall on his buttocks, he developed progressive left leg radiculopathy and quadriceps weakness. Despite conservative efforts, imaging revealed an extruded disc fragment at L3-L4. He underwent two major spinal surgeries over 14 months.
                 </p>
 
-                <p className="mb-4">
-                  Initial emergency care focused on ruling out acute traumatic
-                  injury. CT imaging of the cervical spine was negative for
-                  fracture or acute pathology. The claimant was discharged with
-                  diagnoses of cervical strain and lumbar strain, prescribed
-                  muscle relaxants, and instructed to follow up with primary care.
-                </p>
-
-                <p className="mb-4">
-                  Over the following weeks, the claimant reported persistent and
-                  worsening symptoms despite conservative treatment. Physical
-                  therapy notes document limited range of motion and pain with
-                  movement. After 6 weeks of PT with minimal improvement, the
-                  claimant was referred to pain management.
-                </p>
-
-                <p>
-                  The pain management physician recommended MRI imaging, which
-                  revealed C5-6 disc herniation. This led to cervical epidural
-                  steroid injection in September 2023. The claimant is currently
-                  being evaluated for potential surgical intervention.
+                <p className={`${isEditing ? 'border border-dashed border-border p-2 rounded hover:border-primary cursor-text' : ''}`} contentEditable={isEditing} suppressContentEditableWarning>
+                  His recovery was complicated by failed back syndrome following the first surgery, eventually necessitating a revision fusion with instrumentation.
                 </p>
               </ReportSection>
 
@@ -236,15 +236,15 @@ export default function ClaimReport() {
               <ReportSection
                 ref={(el) => (sectionRefs.current['medical-timeline'] = el)}
                 id="medical-timeline"
-                title="Medical Timeline"
+                title="Medical Timeline (Clinical Milestones)"
               >
                 <div className="mt-4">
-                  {mockMedicalTimeline.map((event, index) => (
+                  {lukeFrazzaTimeline.map((event, index) => (
                     <TimelineEvent
                       key={event.id}
                       event={event}
                       isFirst={index === 0}
-                      isLast={index === mockMedicalTimeline.length - 1}
+                      isLast={index === lukeFrazzaTimeline.length - 1}
                     />
                   ))}
                 </div>
@@ -256,12 +256,8 @@ export default function ClaimReport() {
                 id="contradictions"
                 title="Contradictions & Inconsistencies"
               >
-                <p className="mb-4">
-                  The following contradictions and inconsistencies were identified
-                  across the medical documentation:
-                </p>
                 <div className="space-y-4">
-                  {mockContradictions.map((contradiction) => (
+                  {lukeFrazzaContradictions.map((contradiction) => (
                     <ContradictionCard
                       key={contradiction.id}
                       contradiction={contradiction}
@@ -270,18 +266,14 @@ export default function ClaimReport() {
                 </div>
               </ReportSection>
 
-              {/* Missing Flags */}
+              {/* Missing Documentation */}
               <ReportSection
-                ref={(el) => (sectionRefs.current['missing-flags'] = el)}
-                id="missing-flags"
-                title="What's Missing"
+                ref={(el) => (sectionRefs.current['missing-docs'] = el)}
+                id="missing-docs"
+                title="Missing Documentation"
               >
-                <p className="mb-4">
-                  The following gaps or absences in documentation may be
-                  significant:
-                </p>
                 <div className="space-y-4">
-                  {mockMissingFlags.map((flag) => (
+                  {lukeFrazzaMissingFlags.map((flag) => (
                     <MissingFlagCard key={flag.id} flag={flag} />
                   ))}
                 </div>
@@ -293,37 +285,20 @@ export default function ClaimReport() {
                 id="causation-analysis"
                 title="Causation Analysis"
               >
-                <p className="mb-4">
-                  This section evaluates the relationship between the accident and
-                  the claimed injuries, separating accident-related conditions
-                  from pre-existing conditions and assessing treatment necessity.
-                </p>
-
                 <div className="bg-report-section rounded-lg p-4 mb-4">
-                  <h4 className="font-medium text-foreground mb-2">
-                    Accident Mechanism
-                  </h4>
-                  <p className="text-foreground/90">
-                    Rear-end collision while claimant was a seated bus passenger.
-                    Low-to-moderate impact velocity based on available reports.
-                    Mechanism consistent with cervical hyperextension/hyperflexion
-                    injury pattern.
+                  <h4 className="font-medium text-foreground mb-2">Accident Mechanism</h4>
+                  <p className={`text-foreground/90 ${isEditing ? 'border border-dashed border-border p-2 rounded hover:border-primary cursor-text' : ''}`} contentEditable={isEditing} suppressContentEditableWarning>
+                    Slip on wet floor with axial loading directly onto sacrum.
                   </p>
                 </div>
 
                 <div className="bg-report-section rounded-lg p-4">
-                  <h4 className="font-medium text-foreground mb-2">
-                    Injury Compatibility Assessment
-                  </h4>
-                  <p className="text-foreground/90 mb-2">
-                    <strong>Compatible:</strong> Cervical strain, lumbar strain,
-                    post-traumatic headache
-                  </p>
+                  <h4 className="font-medium text-foreground mb-2">Injury Compatibility Assessment</h4>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="font-semibold text-success">Score: 92 / 100</span>
+                  </div>
                   <p className="text-foreground/90">
-                    <strong>Questionable:</strong> C5-6 disc herniation - while
-                    trauma can cause disc injury, the delayed presentation and
-                    initially negative imaging suggest possible pre-existing
-                    degenerative component
+                    MRI-confirmed extrusion and neurological findings strongly support acute traumatic origin.
                   </p>
                 </div>
               </ReportSection>
@@ -334,38 +309,33 @@ export default function ClaimReport() {
                 id="injury-separation"
                 title="Pre-Existing vs Accident-Related"
               >
-                <div className="grid md:grid-cols-2 gap-4 mb-4">
-                  <div className="bg-success/5 border border-success/20 rounded-lg p-4">
-                    <h4 className="font-medium text-success mb-2">
-                      Accident-Related (Clear)
-                    </h4>
-                    <ul className="space-y-1 text-sm text-foreground/90">
-                      <li>• Cervical strain</li>
-                      <li>• Lumbar strain</li>
-                      <li>• Post-traumatic headache</li>
-                      <li>• Soft tissue inflammation</li>
-                    </ul>
-                  </div>
-
-                  <div className="bg-warning/5 border border-warning/20 rounded-lg p-4">
-                    <h4 className="font-medium text-warning mb-2">
-                      Gray Area / Mixed Causation
-                    </h4>
-                    <ul className="space-y-1 text-sm text-foreground/90">
-                      <li>• C5-6 disc herniation</li>
-                      <li>• Radiculopathy symptoms</li>
-                      <li>• Chronic pain syndrome</li>
-                    </ul>
-                  </div>
+                <div className="border border-border rounded-lg overflow-hidden mb-4">
+                  <table className="w-full">
+                    <thead className="bg-secondary">
+                      <tr>
+                        <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Pre-existing</th>
+                        <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Accident Related</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      <tr>
+                        <td className="px-4 py-3 text-sm text-foreground">Sinusitis</td>
+                        <td className="px-4 py-3 text-sm text-foreground">L3-L4 Disc Herniation</td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 text-sm text-foreground">Knee surgeries</td>
+                        <td className="px-4 py-3 text-sm text-foreground">Extruded fragment</td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 text-sm text-foreground">2003 strain</td>
+                        <td className="px-4 py-3 text-sm text-foreground">L4 radiculopathy</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-
-                <p className="text-muted-foreground text-sm">
-                  Note: No pre-existing medical records were provided. Assessment
-                  based on documented findings and injury mechanism analysis.
-                </p>
               </ReportSection>
 
-              {/* Treatment Mapping */}
+              {/* Treatment-to-Diagnosis Mapping */}
               <ReportSection
                 ref={(el) => (sectionRefs.current['treatment-mapping'] = el)}
                 id="treatment-mapping"
@@ -375,225 +345,155 @@ export default function ClaimReport() {
                   <table className="w-full">
                     <thead className="bg-secondary">
                       <tr>
-                        <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">
-                          Treatment
-                        </th>
-                        <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">
-                          Diagnosis
-                        </th>
-                        <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground">
-                          Supported
-                        </th>
+                        <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Treatment</th>
+                        <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Diagnosis</th>
+                        <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground">Support</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
                       <tr>
-                        <td className="px-4 py-3 text-sm text-foreground">
-                          Physical Therapy (18 sessions)
-                        </td>
-                        <td className="px-4 py-3 text-sm text-foreground">
-                          Cervical/Lumbar Strain
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <Badge variant="low">Supported</Badge>
-                        </td>
+                        <td className="px-4 py-3 text-sm text-foreground">MRI</td>
+                        <td className="px-4 py-3 text-sm text-foreground">Herniation</td>
+                        <td className="px-4 py-3 text-center"><Badge variant="low">100%</Badge></td>
                       </tr>
                       <tr>
-                        <td className="px-4 py-3 text-sm text-foreground">
-                          Cervical ESI
-                        </td>
-                        <td className="px-4 py-3 text-sm text-foreground">
-                          C5-6 Disc Herniation
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <Badge variant="medium">Partial</Badge>
-                        </td>
+                        <td className="px-4 py-3 text-sm text-foreground">Discectomy</td>
+                        <td className="px-4 py-3 text-sm text-foreground">Extrusion</td>
+                        <td className="px-4 py-3 text-center"><Badge variant="low">100%</Badge></td>
                       </tr>
                       <tr>
-                        <td className="px-4 py-3 text-sm text-foreground">
-                          Massage Therapy
-                        </td>
-                        <td className="px-4 py-3 text-sm text-foreground">
-                          No documented diagnosis
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <Badge variant="high">Unsupported</Badge>
-                        </td>
+                        <td className="px-4 py-3 text-sm text-foreground">Sinus Surgery</td>
+                        <td className="px-4 py-3 text-sm text-foreground">Sinusitis</td>
+                        <td className="px-4 py-3 text-center"><Badge variant="high">0%</Badge></td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 text-sm text-foreground">Fusion</td>
+                        <td className="px-4 py-3 text-sm text-foreground">Instability</td>
+                        <td className="px-4 py-3 text-center"><Badge variant="low">100%</Badge></td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 text-sm text-foreground">Hip Injection</td>
+                        <td className="px-4 py-3 text-sm text-foreground">Referred pain</td>
+                        <td className="px-4 py-3 text-center"><Badge variant="medium">Partial</Badge></td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </ReportSection>
 
-              {/* Causation Confidence */}
+              {/* Causation Summary */}
               <ReportSection
                 ref={(el) => (sectionRefs.current['causation-confidence'] = el)}
                 id="causation-confidence"
-                title="Causation Confidence"
+                title="Causation Summary"
               >
                 <ConfidenceIndicator
-                  level="medium"
-                  label="Mixed Confidence"
-                  description="Initial soft tissue injuries are clearly accident-related. However, the C5-6 disc herniation presents causation uncertainty due to: (1) negative initial imaging, (2) delayed presentation of disc pathology, (3) lack of documented pre-accident baseline. Recommend requesting prior medical records to establish baseline condition."
+                  level="high"
+                  label="Strong Causation"
+                  description="The fall caused a structural disc extrusion. Subsequent surgeries stem directly from this injury rather than degeneration."
                 />
               </ReportSection>
 
-              {/* Billing Analysis */}
+              {/* Medical Billing Review */}
               <ReportSection
-                ref={(el) => (sectionRefs.current['billing-analysis'] = el)}
-                id="billing-analysis"
-                title="Billing Analysis"
+                ref={(el) => (sectionRefs.current['medical-billing-review'] = el)}
+                id="medical-billing-review"
+                title="Medical Billing Review"
               >
                 <div className="grid md:grid-cols-3 gap-4 mb-6">
-                  <div className="bg-secondary rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Total Billed
-                    </p>
-                    <p className="text-2xl font-semibold text-foreground">
-                      {formatCurrency(totalBilled)}
-                    </p>
-                  </div>
                   <div className="bg-success/10 rounded-lg p-4">
-                    <p className="text-sm text-success mb-1">
-                      Accident-Attributable
-                    </p>
-                    <p className="text-2xl font-semibold text-success">
-                      {formatCurrency(accidentRelatedBilled)}
-                    </p>
+                    <p className="text-sm text-success mb-1">Accident Related</p>
+                    <p className="text-2xl font-semibold text-success">{formatCurrency(accidentRelatedBilled)}</p>
                   </div>
                   <div className="bg-destructive/10 rounded-lg p-4">
-                    <p className="text-sm text-destructive mb-1">
-                      Unrelated/Unsupported
-                    </p>
-                    <p className="text-2xl font-semibold text-destructive">
-                      {formatCurrency(leakageAmount)}
-                    </p>
+                    <p className="text-sm text-destructive mb-1">Unrelated</p>
+                    <p className="text-2xl font-semibold text-destructive">{formatCurrency(unrelatedBilled)}</p>
+                  </div>
+                  <div className="bg-secondary rounded-lg p-4">
+                    <p className="text-sm text-muted-foreground mb-1">Total</p>
+                    <p className="text-2xl font-semibold text-foreground">{formatCurrency(totalBilled)}</p>
                   </div>
                 </div>
 
-                <BillsTable bills={mockBills} />
-              </ReportSection>
+                <BillsTable bills={lukeFrazzaBills} />
 
-              {/* Leakage Detection */}
-              <ReportSection
-                ref={(el) => (sectionRefs.current['leakage-detection'] = el)}
-                id="leakage-detection"
-                title="Leakage Detection"
-              >
-                <p className="mb-4">
-                  The following billing anomalies were identified:
-                </p>
-
-                <div className="space-y-3">
-                  <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <Badge variant="high">Duplicate</Badge>
-                      <div>
-                        <p className="font-medium text-foreground">
-                          PT Evaluation billed twice (97161)
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Same CPT code billed on 7/3 and 10/1 - likely
-                          re-evaluation after discharge
-                        </p>
+                {/* Duplicate & Unsupported Bills */}
+                <div className="mt-6">
+                  <h4 className="font-medium text-foreground mb-3">Duplicate & Unsupported Bills</h4>
+                  <div className="space-y-3">
+                    <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <Badge variant="high">Duplicate</Badge>
+                        <p className="text-sm text-foreground">Duplicate radiology billing</p>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <Badge variant="high">Unrelated</Badge>
-                      <div>
-                        <p className="font-medium text-foreground">
-                          Massage Therapy - $1,800
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          No prescription or medical documentation supporting this
-                          treatment. Provider not in medical records.
-                        </p>
+                    <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <Badge variant="high">Duplicate</Badge>
+                        <p className="text-sm text-foreground">Duplicate pharmacy entries</p>
+                      </div>
+                    </div>
+                    <div className="bg-warning/5 border border-warning/20 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <Badge variant="medium">Mis-coded</Badge>
+                        <p className="text-sm text-foreground">Mis-coded early diagnostic visit</p>
                       </div>
                     </div>
                   </div>
                 </div>
-              </ReportSection>
 
-              {/* High Impact Bills */}
-              <ReportSection
-                ref={(el) => (sectionRefs.current['high-impact-bills'] = el)}
-                id="high-impact-bills"
-                title="High-Impact Bills"
-              >
-                <p className="mb-4">
-                  These bills represent the largest exposure items and warrant
-                  focused negotiation attention:
-                </p>
-
-                <div className="space-y-3">
-                  {mockBills
-                    .sort((a, b) => b.amount - a.amount)
-                    .slice(0, 5)
-                    .map((bill, index) => (
-                      <div
-                        key={bill.id}
-                        className="flex items-center justify-between p-4 bg-secondary rounded-lg"
-                      >
-                        <div className="flex items-center gap-4">
-                          <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-sm font-semibold text-primary">
-                            {index + 1}
-                          </span>
-                          <div>
-                            <p className="font-medium text-foreground">
-                              {bill.description}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {bill.provider} • {bill.date}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-foreground">
-                            {formatCurrency(bill.amount)}
-                          </p>
-                          <Badge variant={bill.riskScore}>{bill.riskScore}</Badge>
-                        </div>
+                {/* High Impact Bills */}
+                <div className="mt-6">
+                  <h4 className="font-medium text-foreground mb-3">High Impact Bills</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
+                      <span className="font-medium text-foreground">Washington Hospital Center</span>
+                      <span className="font-semibold text-foreground">$19,028</span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
+                      <span className="font-medium text-foreground">Virginia Hospital Center</span>
+                      <span className="font-semibold text-foreground">$15,863.84</span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-foreground">Inova Fairfax</span>
+                        <Badge variant="high">Unrelated</Badge>
                       </div>
-                    ))}
+                      <span className="font-semibold text-foreground">$8,178.05</span>
+                    </div>
+                  </div>
                 </div>
-              </ReportSection>
 
-              {/* Leakage Risk Score */}
-              <ReportSection
-                ref={(el) => (sectionRefs.current['leakage-score'] = el)}
-                id="leakage-score"
-                title="Leakage Risk Score"
-              >
-                <ConfidenceIndicator
-                  level="medium"
-                  label="Moderate Leakage Risk"
-                  description="Identified $2,150 (9% of total) in charges with documentation concerns. Primary risks: (1) Massage therapy with no medical support, (2) Duplicate PT evaluation billing. Recommended actions: Request itemized bills, verify massage therapy prescription, clarify PT re-evaluation necessity."
-                />
-
+                {/* Leakage Risk & Next Steps */}
                 <div className="mt-6 p-4 bg-secondary rounded-lg">
-                  <h4 className="font-medium text-foreground mb-2">
-                    Recommended Next Steps
-                  </h4>
-                  <ol className="list-decimal list-inside space-y-2 text-foreground/90">
-                    <li>Request claimant's pre-accident medical records</li>
-                    <li>Obtain itemized billing statements from all providers</li>
-                    <li>Verify massage therapy prescription and medical necessity</li>
-                    <li>
-                      Consider IME for disc herniation causation determination
+                  <h4 className="font-medium text-foreground mb-2">Leakage Risk & Next Steps</h4>
+                  <ul className="space-y-2 text-foreground/90">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary font-bold">•</span>
+                      <span>Remove unrelated sinus surgery</span>
                     </li>
-                    <li>
-                      Focus negotiation on high-impact bills with causation concerns
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary font-bold">•</span>
+                      <span>Peer review 2006 fusion</span>
                     </li>
-                  </ol>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary font-bold">•</span>
+                      <span>Request missing primary care records</span>
+                    </li>
+                  </ul>
                 </div>
               </ReportSection>
             </div>
           </div>
         </div>
       </div>
+
+      <AddDocumentsModal
+        open={showAddDocs}
+        onOpenChange={setShowAddDocs}
+        onUploadComplete={handleDocumentsAdded}
+        currentDocCount={documentCount}
+      />
     </div>
   );
 }

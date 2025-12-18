@@ -21,7 +21,7 @@ export function ReportTableOfContents({ activeSection, onSectionClick }: ReportT
       sections: reportSections.filter(s => s.order >= 6 && s.order <= 9),
     },
     {
-      title: 'Billing & Leakage',
+      title: 'Medical Billing Review',
       sections: reportSections.filter(s => s.order >= 10),
     },
   ];
