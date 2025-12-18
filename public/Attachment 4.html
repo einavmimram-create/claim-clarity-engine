@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23808080'/></svg>" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elyon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Times New Roman', serif;
+            line-height: 1.6;
+            color: #000;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .pdf-container {
+            max-width: 8.5in;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 1in;
+        }
+        .page {
+            min-height: 11in;
+            page-break-after: always;
+            scroll-margin-top: 20px;
+        }
+        .page:last-child {
+            page-break-after: auto;
+        }
+        h1 {
+            font-size: 18pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        h2 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 10pt;
+        }
+        td {
+            padding: 5px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        .header-info {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 9pt;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 12pt;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .pdf-container {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+        /* Scroll to page 4 on load if hash is present */
+        html:has(#page4) {
+            scroll-behavior: smooth;
+        }
+    </style>
+    <script>
+        // Scroll to page 4 when page loads with hash
+        window.addEventListener('DOMContentLoaded', function() {
+            if (window.location.hash === '#page4') {
+                const page4 = document.getElementById('page4');
+                if (page4) {
+                    setTimeout(() => {
+                        page4.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="pdf-container">
+        <!-- Page 1 -->
+        <div class="page" id="page1">
+            <div class="header-info">
+                Case 1:06-cv-01410-CKK Document 9-5 Filed 11/29/2006 Page 1 of 42
+            </div>
+            <h1>Continuation of Medical Records</h1>
+            <div style="text-align: center; margin-top: 50px;">7</div>
+        </div>
+
+        <!-- Page 2 -->
+        <div class="page" id="page2">
+            <div class="header-info">
+                Case 1:06-cv-01410-CKK Document 9-5 Filed 11/29/2006 Page 2 of 42
+            </div>
+            <div style="text-align: center; margin-top: 50px;">7</div>
+        </div>
+
+        <!-- Page 3 -->
+        <div class="page" id="page3">
+            <div class="header-info">
+                Case 1:06-cv-01410-CKK Document 9-5 Filed 11/29/2006 Page 3 of 42
+            </div>
+            <h2>PATIENT FACESHEET</h2>
+            <h3>VIRGINIA HOSPITAL CENTER</h3>
+            <table>
+                <tr>
+                    <td>DNA?: IFD?: NPP?: 22Apr05</td>
+                    <td></td>
+                    <td>Medical Record #: 06021957</td>
+                </tr>
+                <tr>
+                    <td>Patient Name: FRAZZA, LUKE</td>
+                    <td></td>
+                    <td>Account Number: 005703598</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td><strong>PATIENT DEMOGRAPHIC INFORMATION:</strong><br>
+                        D.O.B.: 10Jul1963 Age: 41<br>
+                        SS#: 144-54-5368 Sex: M<br>
+                        Marital Status: MARRIED<br>
+                        Religion: NONE<br>
+                        Prim Language: NO INTERPRETER<br>
+                        Advance Directive: Living Will<br>
+                        Allergies: N Diabetic: N
+                    </td>
+                    <td></td>
+                    <td><strong>MAILING ADDRESS:</strong><br>
+                        3427 ASTON ST<br>
+                        ANNANDALE VA 22003<br>
+                        Home Phone: (703)244-0361<br><br>
+                        <strong>SPOUSE INFORMATION:</strong><br>
+                        Name: FRAZZA BETH<br>
+                        DOB:
+                    </td>
+                    <td><strong>EMPLOYER INFORMATION:</strong><br>
+                        Empl Status: EMPLOYED FULL-TIME<br>
+                        Occupation: PHOTOJOURNAL<br>
+                        Empl: AGENCE FRANCE-PRESSE<br>
+                        Addr: 1015 15TH ST NW STE 500<br>
+                        WASHINGTON DC 20005<br>
+                        Phone: (202)414-0557
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td><strong>RESPONSIBLE PARTY INFORMATION:</strong><br>
+                        Name: FRAZZA Luke<br>
+                        D.O.B.: 10Jul1963<br>
+                        SS#: 144-54-5368 Sex: M<br>
+                        Relation to Pt: PATIENT
+                    </td>
+                    <td></td>
+                    <td><strong>MAILING ADDRESS:</strong><br>
+                        3427 ASTON ST<br>
+                        ANNANDALE VA 22003<br>
+                        Home Phone: (703)244-0361
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td><strong>ALTERNATE CONTACT INFORMATION:</strong><br>
+                        Name:<br>
+                        Street/PO Box:<br>
+                        City/State/Zip:<br>
+                        Home Phone:<br>
+                        Work Phone:<br>
+                        Relationship:
+                    </td>
+                    <td></td>
+                    <td><strong>PARENT/NEXT OF KIN/EMERGENCY CONTACT:</strong><br>
+                        FRAZZA Beth<br>
+                        3427 ASTON ST<br>
+                        ANNANDALE VA 22003<br>
+                        (703)244-0361<br>
+                        (202)285-2321<br>
+                        WIFE
+                    </td>
+                    <td><strong>PATIENT DESIGNEE:</strong><br>
+                        FRAZZA Beth<br>
+                        3427 ASTON ST<br>
+                        ANNANDALE VA 22003<br>
+                        (703)244-0361<br>
+                        (202)285-2321<br>
+                        WIFE
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td><strong>PRIMARY INSURANCE:</strong><br>
+                        Ins Name: NATIONAL CAPITAL PPO<br>
+                        Insured: FRAZZA Luke<br>
+                        Grp Name: GROUP BEN SRVC<br>
+                        Policy #: 144545368<br>
+                        Group #: 407<br>
+                        Address: PO BOX 419104<br>
+                        ST LOUIS MO 63141<br>
+                        Phone: (800)422-7711<br>
+                        Auth#: 96658-77384
+                    </td>
+                    <td></td>
+                    <td><strong>SECOND INSURANCE:</strong></td>
+                    <td><strong>THIRD INSURANCE:</strong></td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLICT<br>CONFLI</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>Chief Complaint: L3-4 DISCECTOMY<br>
+                        Admit Date & Time: 26Apr05 04:07<br>
+                        Account Type: INPATIENT<br>
+                        Source: PHYSICIAN REFERRAL<br>
+                        ETHNIC ORIG: 1
+                    </td>
+                    <td></td>
+                    <td>Admit/DR Reason: HNP<br>
+                        Discharge Date & Time: 27Apr05 13:14<br>
+                        Acct Subtype:<br>
+                        Bed: 524-01<br>
+                        VIP: COV: N
+                    </td>
+                    <td><strong>ACCOUNT BRANCH</strong><br>
+                        Medical Record #: 005703598<br>
+                        Pre-Admit Bed: AMA<br>
+                        Legally Incompetent:
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td><strong>Admitting MD:</strong><br>
+                        RIEDEL MD, CHARLES 1987<br>
+                        Emergency MD:
+                    </td>
+                    <td></td>
+                    <td><strong>Attending MD:</strong><br>
+                        RIEDEL MD, CHARLES 1987<br>
+                        Primary Care MD:<br>
+                        TERLINSKY MD, ALAN S 0543
+                    </td>
+                    <td><strong>Referring MD:</strong><br>
+                        RIEDEL MD, CHARLES 1987<br>
+                        Medallion PCP:<br>
+                        APR 27 2005
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td><strong>OCCURRENCE CODES:</strong><br>
+                        Code 1: 11 Date: 22Apr05<br>
+                        Code 3: Date:<br>
+                        Code 5: Date:<br>
+                        Code 2: Date:<br>
+                        Code 4: Date:<br>
+                        Code 6: Date: User: 38705
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+            <div style="margin-top: 20px; font-size: 9pt;">VA Hospital Center - 1</div>
+        </div>
+
+        <!-- Page 4 - This is the target page -->
+        <div class="page" id="page4">
+            <div class="header-info">
+                Case 1:06-cv-01410-CKK Document 9-5 Filed 11/29/2006 Page 4 of 42
+            </div>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div>1701 N George Mason Drive Arlington, Virginia 22205-3698 703-558-5000 tel www.virginiahospitalcenter.com</div>
+                <h1 style="margin-top: 20px;">VIRGINIA HOSPITAL CENTER</h1>
+            </div>
+
+            <h1>CONSENT FOR TREATMENT</h1>
+
+            <p style="text-align: center; margin-bottom: 30px;">
+                Virginia Hospital Center Provides Services Without Regard to Race, Religion, National Origin or Disability.
+            </p>
+
+            <h2>THIS IS TO CERTIFY THAT I, THE UNDERSIGNED:</h2>
+
+            <ol style="margin-left: 30px; margin-top: 20px;">
+                <li style="margin-bottom: 15px;">
+                    Consent to the administration to the patient named below such medications and treatments, including but not limited to, the administration of blood and Blood products and the performance of such procedures as may be considered necessary or advisable.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    Release the hospital from any responsibilities for valuables' money, personal or other possessions which are not deposited by me with the hospital depository.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    Authorize the release of any information from hospital records as required by my insurance company or other reimbursing agency for this or a related claim.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    <strong>PATIENTS CERTIFICATION. AUTHORIZATION TO RELEASE INFORMATION. AND PAYMENT REQUEST.</strong> I certify that the information given by me in applying for payment under Title XVII of the Social Security Act is correct. I authorize any holder of medical or other information about me to release to the Social Security Administration or its intermediaries or carriers any information needed for this or a related Medicare claim. I request that the payment of authorized benefits be made on my behalf.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    Understand that if I leave the hospital without the consent of the physician and/or fail to carry out the follow up medical care or follow hospital safety procedures. I do so at my own responsibility.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    Authorize Virginia Hospital Center to act as an agent in the billing of any health insurance covering all hospital services provided, and authorize the physicians in Anesthesiology, Radiology, Pathology, Emergency Medicine, Radiation Therapy, Neonatology, and Physical Medicine, if services are rendered by these professionals during my treatment, as agents with respect to their professional services' and direct that payment of all authorized benefits be made in my behalf directly to such hospital and physicians, and I understand that I am financially responsible for the charges not covered by this authorization.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    Acknowledge that according to Virginia state law, I shall be deemed to have consented and do consent to the testing for infection with Human immunodeficiency Virus, Hepatitis B or Hepatitis C viruses should any health care provider, or any person employed by or under the direction and control of a health care provider, be directly exposed to my body fluids in connection with rendering care to me as a patient, in a manner which may, according to the current guidelines of the Centers for Disease Control, transmit HIV, Hepatitis B or C viruses to such health care provider or person. Such test results may be released to the person who was exposed.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    The hospital participates in a Georgetown affiliated teaching program. As part of the program, physicians may be assisted in patient care by residents and/or medical students. I understand that I have the right to refuse residents and/or medical student not be involved in my case should I so desire.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    The hospital participates with a premier polling group to conduct surveys with former inpatients and outpatients...
+                </li>
+            </ol>
+
+            <div style="margin-top: 40px;">
+                <table>
+                    <tr>
+                        <td>Time:</td>
+                        <td>Diet:</td>
+                        <td>Comments:</td>
+                    </tr>
+                    <tr>
+                        <td>10:00-10:30</td>
+                        <td>100</td>
+                        <td>15</td>
+                    </tr>
+                    <tr>
+                        <td>10:30-10:30</td>
+                        <td>100</td>
+                        <td>15</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <table>
+                    <tr>
+                        <td><strong>Accucheck</strong></td>
+                        <td><strong>Time</strong></td>
+                        <td><strong>Value</strong></td>
+                    </tr>
+                    <tr>
+                        <td>☐</td>
+                        <td>☐</td>
+                        <td>☐</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-top: 20px;">
+                Comments:<br>
+                10:00-10:30<br>
+                150<br>
+                R140C<br>
+                Diet R140C<br>
+                Diet R140C<br>
+                Diet R140C
+            </div>
+
+            <div style="margin-top: 30px; font-size: 9pt;">
+                Virginia Hospital Center<br>
+                Page 12 of 21<br>
+                Run Date: 04/26/2005
+            </div>
+        </div>
+
+        <!-- Page 5 and beyond - Additional pages with medical records -->
+        <div class="page" id="page5">
+            <div class="header-info">
+                Case 1:06-cv-01410-CKK Document 9-5 Filed 11/29/2006 Page 39 of 42
+            </div>
+            <h2>Case Record</h2>
+            <table>
+                <tr>
+                    <td>Name: FRAZZA, Luke</td>
+                    <td>Acct #: 005703598</td>
+                    <td>Status: 3</td>
+                    <td>Unit #: 06021957</td>
+                </tr>
+                <tr>
+                    <td>Admit Date: 04/26/2005</td>
+                    <td>Discharge Date:</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <div class="section-title">REGISTERED TRAFFIC DEPARTMENT TO PROFESSIONAL</div>
+
+            <div class="section-title">Section Name: pacu -- Page: PACU_landO</div>
+
+            <h3>INTAKE:</h3>
+            <table>
+                <tr>
+                    <td><strong>Time:</strong></td>
+                    <td><strong>Type:</strong></td>
+                    <td><strong>Site:</strong></td>
+                    <td><strong>Amount:</strong></td>
+                </tr>
+                <tr>
+                    <td>10:00</td>
+                    <td>FCA</td>
+                    <td>Furniture Location:</td>
+                    <td>0</td>
+                </tr>
+            </table>
+            <div>Intake Total: 300</div>
+
+            <h3>OUTPUT:</h3>
+            <table>
+                <tr>
+                    <td><strong>Urine Output:</strong></td>
+                    <td><strong>Time:</strong></td>
+                    <td><strong>Characteristic:</strong></td>
+                    <td><strong>Amount:</strong></td>
+                </tr>
+                <tr>
+                    <td>No</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <table>
+                <tr>
+                    <td><strong>Drains:</strong></td>
+                    <td><strong>Time:</strong></td>
+                    <td><strong>Type:</strong></td>
+                    <td><strong>Characteristic:</strong></td>
+                    <td><strong>Site:</strong></td>
+                    <td><strong>Amount:</strong></td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>10:00</td>
+                    <td>FCA</td>
+                    <td>Furniture Location:</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+            </table>
+
+            <div>Comments:<br>
+            TARGET: 1000 TOTALS 1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000</div>
+
+            <div>Output Total: 300</div>
+
+            <div class="section-title">Section Name: phase_2 -- Page: PHASE_2_Time_In_Out</div>
+
+            <h3>PHASE II:</h3>
+            <table>
+                <tr>
+                    <td>Phase 2 Time In:</td>
+                    <td>Phase 2 Time Out:</td>
+                    <td>Identified By:</td>
+                </tr>
+                <tr>
+                    <td>Transfer Method:</td>
+                    <td>Pt/family states full name:</td>
+                    <td>Discharge Criteria:</td>
+                </tr>
+                <tr>
+                    <td>Pt/family states DOB:</td>
+                    <td>Verified Ride Home:</td>
+                    <td>Armband information correct and on pt:</td>
+                </tr>
+                <tr>
+                    <td>Latex Sensitivity? N</td>
+                    <td>AIMAD</td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <div>Nurses Notes:<br>
+            Reaction:<br>
+            Anesthesia Type: GEN<br>
+            Allergies? N<br>
+            Patient Type: AMAD<br>
+            VA Hospital Center - 37<br>
+            Medications Taken Today: Y</div>
+
+            <div style="margin-top: 20px; font-size: 9pt;">
+                Virginia Hospital Center<br>
+                Page 13 of 21<br>
+                Run Date: 04/26/2005
+            </div>
+        </div>
+
+        <!-- Page 6 -->
+        <div class="page" id="page6">
+            <div class="header-info">
+                Case 1:06-cv-01410-CKK Document 9-5 Filed 11/29/2006 Page 40 of 42
+            </div>
+            <h2>Case Record</h2>
+            <table>
+                <tr>
+                    <td>Name: FRAZZA, Luke</td>
+                    <td>Acct #: 005703598</td>
+                    <td>Status: 3</td>
+                    <td>Unit #: 06021957</td>
+                </tr>
+                <tr>
+                    <td>Admit Date: 04/26/2005</td>
+                    <td>Discharge Date:</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <div class="section-title">ALLERGIES:</div>
+
+            <div class="section-title">Section Name : phase_2 -- Page : PHASE_2_VS</div>
+
+            <h3>PRE-OPERATIVE VITAL SIGNS:</h3>
+            <table>
+                <tr>
+                    <td><strong>Time</strong></td>
+                    <td><strong>B/P</strong></td>
+                    <td><strong>HR</strong></td>
+                    <td><strong>Resp</strong></td>
+                    <td><strong>O2 Sat: %</strong></td>
+                    <td><strong>O2 Source</strong></td>
+                    <td><strong>Temp</strong></td>
+                    <td><strong>Temp Source</strong></td>
+                </tr>
+            </table>
+
+            <h3>PHASE 2 VITAL SIGNS:</h3>
+            <table>
+                <tr>
+                    <td><strong>Time</strong></td>
+                    <td><strong>By:</strong></td>
+                    <td><strong>B/P</strong></td>
+                    <td><strong>HR</strong></td>
+                    <td><strong>Resp</strong></td>
+                    <td><strong>O2 Sat: %</strong></td>
+                    <td><strong>O2 Source</strong></td>
+                    <td><strong>Temp</strong></td>
+                    <td><strong>Temp Source</strong></td>
+                </tr>
+            </table>
+
+            <div>Nurses Notes:</div>
+
+            <div class="section-title">Section Name : phase_2 -- Page : PHASE2_aldrete</div>
+
+            <h3>PHASE 2 ALDRETE:</h3>
+            <table>
+                <tr>
+                    <td><strong>TIME</strong></td>
+                    <td><strong>ACTIVITY</strong></td>
+                    <td><strong>CIRCULATION</strong></td>
+                    <td><strong>LOC</strong></td>
+                    <td><strong>RESPIRATIONS</strong></td>
+                    <td><strong>SKIN COLOR</strong></td>
+                    <td><strong>ALDRETE SCORE</strong></td>
+                </tr>
+            </table>
+
+            <h3>FOR EPIDURAL/SPINAL PATIENTS ONLY:</h3>
+            <div>Nurses Notes:</div>
+            <table>
+                <tr>
+                    <td><strong>Time</strong></td>
+                    <td><strong>By:</strong></td>
+                    <td><strong>Dermatomes:</strong></td>
+                    <td><strong>Motor Function</strong></td>
+                </tr>
+            </table>
+
+            <div class="section-title">Section Name : phase_2 -- Page : PHASE_2_Assessment_1</div>
+
+            <h3>PHASE II ASSESSMENT:</h3>
+            <table>
+                <tr>
+                    <td><strong>Time:</strong></td>
+                    <td><strong>By:</strong></td>
+                    <td><strong>Orientation:</strong></td>
+                    <td><strong>Respirations:</strong></td>
+                    <td><strong>Dressing:</strong></td>
+                    <td><strong>Site Care:</strong></td>
+                </tr>
+            </table>
+
+            <div style="margin-top: 20px; font-size: 9pt;">
+                VA Hospital Center - 386<br>
+                Virginia Hospital Center<br>
+                Page 14 of 21<br>
+                Run Date: 04/26/2005
+            </div>
+        </div>
+
+        <!-- Page 7 -->
+        <div class="page" id="page7">
+            <div class="header-info">
+                Case 1:06-cv-01410-CKK Document 9-5 Filed 11/29/2006 Page 41 of 42
+            </div>
+            <h2>Case Record</h2>
+            <table>
+                <tr>
+                    <td>Name: FRAZZA, Luke</td>
+                    <td>Acct #: 005703598</td>
+                    <td>Status: 3</td>
+                    <td>Unit #: 06021957</td>
+                </tr>
+                <tr>
+                    <td>Admit Date: 04/26/2005</td>
+                    <td>Discharge Date: 04/26/2005</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <table>
+                <tr>
+                    <td>BGM:</td>
+                    <td>Result:</td>
+                    <td>IV:</td>
+                    <td>Siderails X2:</td>
+                    <td>Call bell in reach:</td>
+                    <td>See Notes:</td>
+                </tr>
+                <tr>
+                    <td>PO Fluids:</td>
+                    <td>Nausea:</td>
+                    <td>Vomiting:</td>
+                    <td>Other (SNN):</td>
+                    <td>Assessment unchanged except as noted:</td>
+                    <td>Nurses Notes:</td>
+                </tr>
+            </table>
+
+            <div class="section-title">Section Name : phase_2 -- Page : PHASE_2_Assess_2</div>
+
+            <h3>PHASE II ASSESSMENT:</h3>
+            <table>
+                <tr>
+                    <td><strong>Time:</strong></td>
+                    <td><strong>Pain:</strong></td>
+                    <td><strong>Site:</strong></td>
+                    <td><strong>Quality:</strong></td>
+                    <td><strong>Visual/Analoginary:</strong></td>
+                    <td><strong>Assessment:</strong></td>
+                    <td><strong>Notes:</strong></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>Time By:</td>
+                    <td>Void:</td>
+                    <td>Foley: See Notes:</td>
+                </tr>
+            </table>
+
+            <h3>Neurovascular Assessment:</h3>
+            <table>
+                <tr>
+                    <td><strong>Time:</strong></td>
+                    <td><strong>By:</strong></td>
+                    <td><strong>Color of Extremities:</strong></td>
+                    <td><strong>Capillary Refill:</strong></td>
+                    <td><strong>Peripheral Pulses:</strong></td>
+                    <td><strong>Motor Function:</strong></td>
+                    <td><strong>Mobility:</strong></td>
+                    <td><strong>Assessment Unchanged Except as Noted:</strong></td>
+                </tr>
+            </table>
+
+            <h3>Gyn Assessment:</h3>
+            <table>
+                <tr>
+                    <td><strong>Time:</strong></td>
+                    <td><strong>By:</strong></td>
+                    <td><strong>Pad Count:</strong></td>
+                    <td><strong>Vaginal Drainage:</strong></td>
+                    <td><strong>Assessment Unchanged Except as Noted:</strong></td>
+                    <td><strong>Nurses Notes:</strong></td>
+                </tr>
+            </table>
+
+            <div class="section-title">Section Name : phase_2 -- Page : PHASE_2_landO</div>
+
+            <h3>PHASE 2 IV INTAKE:</h3>
+            <table>
+                <tr>
+                    <td><strong>Time:</strong></td>
+                    <td><strong>Site:</strong></td>
+                    <td><strong>Intake Type:</strong></td>
+                    <td><strong>Amount Up:</strong></td>
+                    <td><strong>Quantity:</strong></td>
+                </tr>
+            </table>
+
+            <div>IV Discontinued at: 04/26/2005<br>
+            Total IV Fluids in COPS: 06021957</div>
+
+            <h3>PHASE II OUTPUT: None</h3>
+
+            <div style="margin-top: 20px; font-size: 9pt;">
+                VA Hospital Center - 39<br>
+                Virginia Hospital Center<br>
+                Page 15 of 21<br>
+                Run Date: 04/26/2005
+            </div>
+        </div>
+
+        <!-- Page 8 -->
+        <div class="page" id="page8">
+            <div class="header-info">
+                Case 1:06-cv-01410-CKK Document 9-5 Filed 11/29/2006 Page 42 of 42
+            </div>
+            <h2>Case Record</h2>
+            <table>
+                <tr>
+                    <td>Name: FRAZZA, Luke</td>
+                    <td>Acct #: 005703598</td>
+                    <td>Status: 3</td>
+                    <td>Unit #: 06021957</td>
+                </tr>
+                <tr>
+                    <td>Admit Date: 04/26/2005</td>
+                    <td>Discharge Date:</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <table>
+                <tr>
+                    <td><strong>Time:</strong></td>
+                    <td><strong>Output Amount:</strong></td>
+                    <td><strong>Type:</strong></td>
+                </tr>
+            </table>
+
+            <div class="section-title">Section Name : phase_2 -- Page : PHASE_2_ Meds</div>
+
+            <h3>PHASE II MEDICATIONS:</h3>
+            <table>
+                <tr>
+                    <td><strong>Pyxis Medications:</strong></td>
+                    <td><strong>Time:</strong></td>
+                    <td><strong>Dose:</strong></td>
+                    <td><strong>Route:</strong></td>
+                    <td><strong>Adm. By:</strong></td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td><strong>Other Medications:</strong></td>
+                    <td><strong>Time:</strong></td>
+                    <td><strong>Dose:</strong></td>
+                    <td><strong>Route:</strong></td>
+                    <td><strong>Adm. By:</strong></td>
+                </tr>
+            </table>
+
+            <div>Nurses Notes:</div>
+
+            <div class="section-title">Section Name : phase_2 -- Page : PHASE_2_Education_Record</div>
+
+            <h3>MULTI-DISCIPLINARY EDUCATION RECORD</h3>
+            <table>
+                <tr>
+                    <td><strong>LEARNING NEEDS THIS ADMISSION:</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td><strong>LEVEL OF EDUCATION COMPLETED:</strong></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Activity:</td>
+                    <td>Organ Donation:</td>
+                    <td>Grade School:</td>
+                    <td>Nurses Notes:</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Advance Directives:</td>
+                    <td>Pain Management:</td>
+                    <td>High School:</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Disease/Condition:</td>
+                    <td>S/S to Report:</td>
+                    <td>>High School:</td>
+                    <td>See Nurses Notes:</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Medications:</td>
+                    <td>Tests/Procedures:</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Nutrition:</td>
+                    <td>Wound/Incision Care:</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <table>
+                <tr>
+                    <td><strong>READINESS TO LEARN:</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td><strong>Date:</strong></td>
+                    <td><strong>Time:</strong></td>
+                    <td><strong>Nurse:</strong></td>
+                </tr>
+                <tr>
+                    <td>Ask Questions:</td>
+                    <td>Verbalizes Need to Learn:</td>
+                    <td></td>
+                    <td>10/27/2006</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Too Anxious to Learn:</td>
+                    <td>Unreceptive to Learning:</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Physical Limitations:</td>
+                    <td>Denies Needs:</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <table>
+                <tr>
+                    <td><strong>BARRIERS TO LEARNING:</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td><strong>LEARNS BEST BY:</strong></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Barriers?</td>
+                    <td>Reading/Writing:</td>
+                    <td>Language:</td>
+                    <td>Doing:</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Psychological/Emotion:</td>
+                    <td>Hearing Impaired:</td>
+                    <td></td>
+                    <td>Listening:</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Cognitive/Sensory:</td>
+                    <td>Vision Impairment:</td>
+                    <td></td>
+                    <td>Seeing:</td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <div class="section-title">Section Name : phase_2 -- Page : PHASE_2_Care_Plan_1</div>
+
+            <h3>PLAN OF CARE</h3>
+
+            <div style="margin-top: 20px; font-size: 9pt;">
+                VA Hospital Center - 40<br>
+                Virginia Hospital Center<br>
+                Page 16 of 21<br>
+                Run Date: 04/26/2005
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
