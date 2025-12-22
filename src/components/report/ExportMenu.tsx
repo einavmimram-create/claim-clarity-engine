@@ -31,8 +31,9 @@ export function ExportMenu() {
           <div
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
+            style={{ pointerEvents: 'auto' }}
           />
-          <div className="absolute right-0 top-full mt-2 w-64 bg-card border border-border rounded-lg shadow-elevated z-50 py-2 animate-fade-in">
+          <div className="absolute right-0 top-full mt-2 w-64 bg-card border border-border rounded-lg shadow-elevated z-50 py-2 animate-fade-in" style={{ pointerEvents: 'auto' }}>
             {exportOptions.map((option) => (
               <button
                 key={option.format}

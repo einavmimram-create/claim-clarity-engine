@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Edit3, Plus, Save, X } from 'lucide-react';
 import { AppHeader } from '@/components/layout/AppHeader';
-import { ReportTableOfContents } from '@/components/report/ReportTableOfContents';
+import { ReportSidebar } from '@/components/report/ReportSidebar';
 import { ReportSection } from '@/components/report/ReportSection';
 import { TimelineEvent } from '@/components/report/TimelineEvent';
 import { ContradictionCard } from '@/components/report/ContradictionCard';
@@ -15,19 +15,16 @@ import { AddDocumentsModal } from '@/components/claims/AddDocumentsModal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
-import { mockClaims, reportSections } from '@/data/mockClaims';
+import { mockClaims } from '@/data/mockClaims';
 import { getClaimReportData, getReportTitle, getReportType } from '@/utils/reportData';
 import { MedicalEvent, Contradiction, MissingFlag, BillItem } from '@/types/claim';
 
 export default function ClaimReport() {
   const { id } = useParams();
-  const [activeSection, setActiveSection] = useState('executive-summary');
   const [isEditing, setIsEditing] = useState(false);
   const [showAddDocs, setShowAddDocs] = useState(false);
   const [documentCount, setDocumentCount] = useState(47);
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
-  const isNavigatingRef = useRef(false);
-  const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const claim = mockClaims.find((c) => c.id === id) || mockClaims[0];
   
@@ -76,134 +73,6 @@ export default function ClaimReport() {
     }
   }, [id, claim.id]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      // Don't update active section during programmatic navigation
-      if (isNavigatingRef.current) {
-        return;
-      }
-
-      const scrollPosition = window.scrollY + 200; // Account for sticky header + threshold
-      const baseBillingSubsections = ['billing-overview', 'line-item-billing-review', 'billing-issues-exceptions'];
-      const fullReportBillingSubsections = ['high-impact-bills', 'leakage-risk-next-steps'];
-      const allBillingSubsections = isMVP
-        ? baseBillingSubsections
-        : [...baseBillingSubsections, ...fullReportBillingSubsections];
-      
-      // Find the section whose top is closest to (but above or at) the scroll position
-      let bestMatch: { id: string; top: number } | null = null;
-      
-      // Check billing subsections first (they're nested within medical-billing-review)
-      for (const subsectionId of allBillingSubsections) {
-        const ref = sectionRefs.current[subsectionId];
-        if (ref) {
-          const rect = ref.getBoundingClientRect();
-          const sectionTop = rect.top + window.scrollY;
-          const sectionBottom = sectionTop + rect.height;
-          
-          // Section is active if scroll position is within its bounds
-          if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
-            // Prefer the section that starts closest to our scroll position
-            if (!bestMatch || sectionTop > bestMatch.top) {
-              bestMatch = { id: subsectionId, top: sectionTop };
-            }
-          }
-        }
-      }
-
-      // If no billing subsection matched, check main sections in document order
-      // Process sections starting with Overview (order === 1) as the first content section
-      if (!bestMatch) {
-        // Get all main sections sorted by their order property (Overview first, then Medical Analysis, etc.)
-        const sortedSections = [...reportSections]
-          .filter(section => {
-            // Only include sections that exist in sectionRefs and are not billing subsections
-            return sectionRefs.current[section.id] && !allBillingSubsections.includes(section.id);
-          })
-          .sort((a, b) => a.order - b.order); // Sort by order: 1, 2, 3, etc. (Overview first)
-        
-        // Iterate through sections in document order (Overview is first)
-        for (const section of sortedSections) {
-          const ref = sectionRefs.current[section.id];
-          if (ref) {
-            const rect = ref.getBoundingClientRect();
-            const sectionTop = rect.top + window.scrollY;
-            const sectionBottom = sectionTop + rect.height;
-            
-            // Section is active if scroll position is within its bounds
-            if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
-              // Prefer the section that starts closest to our scroll position
-              if (!bestMatch || sectionTop > bestMatch.top) {
-                bestMatch = { id: section.id, top: sectionTop };
-              }
-            }
-          }
-        }
-      }
-      
-      // Update active section if we found a match
-      if (bestMatch) {
-        setActiveSection(bestMatch.id);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isMVP]);
-
-  const handleSectionClick = (sectionId: string) => {
-    // Immediately set the clicked section as active
-    setActiveSection(sectionId);
-    
-    // Lock navigation to prevent scroll-based updates during smooth scroll
-    isNavigatingRef.current = true;
-    
-    // Clear any existing timeout
-    if (navigationTimeoutRef.current) {
-      clearTimeout(navigationTimeoutRef.current);
-    }
-    
-    // Try to find element by ID first
-    let element = document.getElementById(sectionId);
-    
-    // If not found, check sectionRefs (for elements that might not have IDs)
-    if (!element && sectionRefs.current[sectionId]) {
-      element = sectionRefs.current[sectionId];
-    }
-    
-    if (element) {
-      // Account for sticky header offset
-      const headerOffset = 160;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-      
-      // Re-enable scroll-based updates after scroll animation completes
-      // Smooth scroll typically takes ~500-1000ms, use 1000ms to be safe
-      navigationTimeoutRef.current = setTimeout(() => {
-        isNavigatingRef.current = false;
-        // Trigger a scroll update to ensure correct active state after navigation
-        const event = new Event('scroll');
-        window.dispatchEvent(event);
-      }, 1000);
-    } else {
-      // If element not found, unlock immediately
-      isNavigatingRef.current = false;
-    }
-  };
-  
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (navigationTimeoutRef.current) {
-        clearTimeout(navigationTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const handleDocumentsAdded = (count: number) => {
     setDocumentCount((prev) => prev + count);
@@ -290,13 +159,7 @@ export default function ClaimReport() {
       {/* Report Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex gap-8">
-          <ReportTableOfContents
-            key={claim.id}
-            activeSection={activeSection}
-            onSectionClick={handleSectionClick}
-            reportType={reportType}
-          />
-
+          <ReportSidebar reportType={reportType} />
           <div className="flex-1 max-w-4xl">
             <div className={`bg-report-bg rounded-xl border border-border p-8 shadow-card ${isEditing ? 'ring-2 ring-primary/20' : ''}`}>
               {isEditing && (
