@@ -18,6 +18,18 @@ export interface MedicalEvent {
   description: string;
   sourceDocument: string;
   sourcePageRef: string;
+  // Optional detailed fields for expanded view
+  narrativeSummary?: string;
+  patientComplaints?: string[];
+  medicalSpecialties?: string[];
+  medicalFacilities?: string[];
+  procedureTypes?: string[];
+  vitals?: Record<string, string>;
+  diagnostics?: string[];
+  interventions?: string[];
+  isKeyDate?: boolean;
+  needsReview?: boolean;
+  fileIds?: string[];
 }
 
 export interface Contradiction {

@@ -7,29 +7,43 @@ interface ReportSidebarProps {
   reportType?: ReportType;
 }
 
+interface Subsection {
+  id: string;
+  title: string;
+}
+
+interface SectionWithSubsections {
+  id: string;
+  title: string;
+  subsections?: Subsection[];
+}
+
 export function ReportSidebar({ reportType }: ReportSidebarProps) {
   const isMVP = reportType === 'mvp';
   const [activeSection, setActiveSection] = useState<string>('executive-summary');
   
-  // Filter sections based on report type
-  const visibleSections = isMVP
-    ? reportSections.filter(s => 
-        s.id === 'executive-summary' ||
-        s.id === 'medical-timeline' ||
-        s.id === 'causation-analysis' ||
-        s.id === 'injury-separation' ||
-        s.id === 'medical-billing-review'
-      )
-    : reportSections;
-  
-  // Billing subsections
-  const baseBillingSubsections = [
+  // Define section hierarchy
+  const medicalNarrativeSubsections: Subsection[] = [
+    { id: 'medical-narrative', title: 'Claimant Medical Summary' }, // Links to medical-narrative section
+    { id: 'medical-timeline', title: 'Medical Timeline' },
+    { id: 'contradictions', title: 'Contradictions & Inconsistencies' },
+    { id: 'missing-docs', title: 'Missing Documentation' },
+  ];
+
+  const causationAnalysisSubsections: Subsection[] = [
+    { id: 'causation-analysis', title: 'Accident Mechanism' },
+    { id: 'injury-separation', title: 'Medical Condition Classification' },
+    { id: 'treatment-mapping', title: 'Treatment-to-Diagnosis Mapping' },
+    { id: 'causation-confidence', title: 'Causation Summary' },
+  ];
+
+  const baseBillingSubsections: Subsection[] = [
     { id: 'billing-overview', title: 'Billing Overview' },
     { id: 'line-item-billing-review', title: 'Line-Item Billing Review' },
     { id: 'billing-issues-exceptions', title: 'Billing Issues & Exceptions' },
   ];
 
-  const fullReportBillingSubsections = [
+  const fullReportBillingSubsections: Subsection[] = [
     { id: 'high-impact-bills', title: 'High Impact Bills' },
     { id: 'leakage-risk-next-steps', title: 'Leakage Risk & Next Steps' },
   ];
@@ -38,21 +52,61 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
     ? baseBillingSubsections
     : [...baseBillingSubsections, ...fullReportBillingSubsections];
 
+  // Build structured sections
+  const structuredSections: SectionWithSubsections[] = [
+    { id: 'executive-summary', title: 'Executive Summary' },
+    {
+      id: 'medical-narrative',
+      title: 'Medical Narrative',
+      subsections: isMVP
+        ? [medicalNarrativeSubsections[1]] // Only Medical Timeline for MVP
+        : medicalNarrativeSubsections,
+    },
+    {
+      id: 'causation-analysis',
+      title: 'Causation Analysis',
+      subsections: isMVP
+        ? [causationAnalysisSubsections[0]] // Only Accident Mechanism for MVP
+        : causationAnalysisSubsections,
+    },
+    {
+      id: 'medical-billing-review',
+      title: 'Medical Billing Review',
+      subsections: billingSubsections,
+    },
+  ];
+
+  // Get all subsection IDs for scroll tracking
+  const getAllSubsectionIds = (): string[] => {
+    const ids: string[] = [];
+    structuredSections.forEach((section) => {
+      if (section.subsections) {
+        section.subsections.forEach((sub) => ids.push(sub.id));
+      }
+    });
+    return ids;
+  };
+
+  // Check if a section or any of its subsections is active
+  const isSectionActive = (section: SectionWithSubsections): boolean => {
+    if (activeSection === section.id) return true;
+    if (section.subsections) {
+      return section.subsections.some((sub) => activeSection === sub.id);
+    }
+    return false;
+  };
+
   // Track active section based on scroll position
   useEffect(() => {
-    const baseBillingIds = ['billing-overview', 'line-item-billing-review', 'billing-issues-exceptions'];
-    const fullReportBillingIds = ['high-impact-bills', 'leakage-risk-next-steps'];
-    const allBillingSubsections = isMVP
-      ? baseBillingIds
-      : [...baseBillingIds, ...fullReportBillingIds];
+    const allSubsectionIds = getAllSubsectionIds();
     
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 200; // Account for sticky header
       
       let bestMatch: { id: string; top: number } | null = null;
       
-      // Check billing subsections first
-      for (const subsectionId of allBillingSubsections) {
+      // Check all subsections first
+      for (const subsectionId of allSubsectionIds) {
         const element = document.getElementById(subsectionId);
         if (element) {
           const rect = element.getBoundingClientRect();
@@ -69,16 +123,9 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
 
       // Check main sections
       if (!bestMatch) {
-        const sortedSections = [...reportSections]
-          .filter(section => {
-            const element = document.getElementById(section.id);
-            return element && !allBillingSubsections.includes(section.id);
-          })
-          .sort((a, b) => a.order - b.order);
-        
-        for (const section of sortedSections) {
+        for (const section of structuredSections) {
           const element = document.getElementById(section.id);
-          if (element) {
+          if (element && !allSubsectionIds.includes(section.id)) {
             const rect = element.getBoundingClientRect();
             const sectionTop = rect.top + window.scrollY;
             const sectionBottom = sectionTop + rect.height;
@@ -113,42 +160,52 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
         {/* 2 empty lines at the top */}
         <div className="h-16"></div>
         <ul className="space-y-1">
-          {visibleSections.map((section) => (
-            <li key={section.id}>
-              <a
-                href={`#${section.id}`}
-                onClick={() => handleClick(section.id)}
-                className={cn(
-                  'block px-3 py-2 text-sm rounded-lg transition-colors',
-                  activeSection === section.id
-                    ? 'bg-primary text-primary-foreground font-medium'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+          {structuredSections.map((section) => {
+            const sectionIsActive = isSectionActive(section);
+            
+            return (
+              <li key={section.id}>
+                {/* Parent Section */}
+                <a
+                  href={`#${section.id}`}
+                  onClick={() => handleClick(section.id)}
+                  className={cn(
+                    'block px-3 py-2 text-sm rounded-lg transition-colors font-medium',
+                    sectionIsActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-foreground hover:bg-secondary'
+                  )}
+                >
+                  {section.title}
+                </a>
+                
+                {/* Subsections */}
+                {section.subsections && section.subsections.length > 0 && (
+                  <ul className="mt-1 space-y-0.5">
+                    {section.subsections.map((subsection) => {
+                      const subsectionIsActive = activeSection === subsection.id;
+                      return (
+                        <li key={subsection.id}>
+                          <a
+                            href={`#${subsection.id}`}
+                            onClick={() => handleClick(subsection.id)}
+                            className={cn(
+                              'block px-3 py-1.5 text-xs rounded-md transition-colors ml-3',
+                              subsectionIsActive
+                                ? 'bg-primary/90 text-primary-foreground font-medium'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                            )}
+                          >
+                            {subsection.title}
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 )}
-              >
-                {section.title}
-              </a>
-              {section.id === 'medical-billing-review' && (
-                <ul className="ml-4 mt-1 space-y-1">
-                  {billingSubsections.map((subsection) => (
-                    <li key={subsection.id}>
-                      <a
-                        href={`#${subsection.id}`}
-                        onClick={() => handleClick(subsection.id)}
-                        className={cn(
-                          'block px-3 py-2 text-sm rounded-lg transition-colors',
-                          activeSection === subsection.id
-                            ? 'bg-primary text-primary-foreground font-medium'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-                        )}
-                      >
-                        {subsection.title}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </nav>
