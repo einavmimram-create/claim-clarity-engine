@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, HTMLAttributes } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Edit3, Plus, Save, X } from 'lucide-react';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -41,6 +41,21 @@ export default function ClaimReport() {
   const reportTitle = getReportTitle(claim);
   const reportType = getReportType(claim);
   const isMVP = reportType === 'mvp';
+
+  // Shared inline editing helpers
+  const editableAttributes: Pick<HTMLAttributes<HTMLElement>, 'contentEditable' | 'suppressContentEditableWarning'> =
+    isEditing
+      ? {
+          contentEditable: true,
+          suppressContentEditableWarning: true,
+        }
+      : {};
+  const editableBlockClass = isEditing
+    ? 'border border-dashed border-border p-2 rounded hover:border-primary cursor-text'
+    : '';
+  const editableInlineClass = isEditing
+    ? 'border border-dashed border-border rounded hover:border-primary cursor-text'
+    : '';
 
   // Calculate billing totals from current bills state
   // For MVP, use fixed totals as specified
@@ -174,11 +189,11 @@ export default function ClaimReport() {
                 id="executive-summary"
                 title="Executive Summary"
               >
-                <p className={`mb-4 ${isEditing ? 'border border-dashed border-border p-2 rounded hover:border-primary cursor-text' : ''}`} contentEditable={isEditing} suppressContentEditableWarning>
+                <p className={`mb-4 ${editableBlockClass}`} {...editableAttributes}>
                   This report provides a comprehensive analysis of the medical treatment and associated costs for Luke Frazza following a slip-and-fall accident on January 23, 2005. The claimant, a professional photographer, suffered an acute L3-L4 disc herniation with an extruded fragment. His clinical course included a failed initial discectomy in April 2005, leading to a complex 360-degree revision fusion in June 2006.
                 </p>
 
-                <p className={`mb-4 ${isEditing ? 'border border-dashed border-border p-2 rounded hover:border-primary cursor-text' : ''}`} contentEditable={isEditing} suppressContentEditableWarning>
+                <p className={`mb-4 ${editableBlockClass}`} {...editableAttributes}>
                   While the claimant had a prior history of a lumbosacral strain in 2003 and unrelated sinus surgery in 2004, the clinical evidence supports the 2005 fall as the primary cause of his structural spinal injury. The total reviewed billing is {formatCurrency(totalBilled)}, with {formatCurrency(accidentRelatedBilled)} deemed accident-related and {formatCurrency(unrelatedBilled)} identified as unrelated to the trauma.
                 </p>
 
@@ -196,11 +211,11 @@ export default function ClaimReport() {
                   title="Medical Narrative"
                 >
                   <h3 className="font-semibold text-foreground mb-3">Claimant Medical Summary</h3>
-                  <p className={`mb-4 ${isEditing ? 'border border-dashed border-border p-2 rounded hover:border-primary cursor-text' : ''}`} contentEditable={isEditing} suppressContentEditableWarning>
+                  <p className={`mb-4 ${editableBlockClass}`} {...editableAttributes}>
                     Luke Frazza is a 41-year-old male who sustained a significant lumbar injury while working at the White House. Following a fall on his buttocks, he developed progressive left leg radiculopathy and quadriceps weakness. Despite conservative efforts, imaging revealed an extruded disc fragment at L3-L4. He underwent two major spinal surgeries over 14 months.
                   </p>
 
-                  <p className={`${isEditing ? 'border border-dashed border-border p-2 rounded hover:border-primary cursor-text' : ''}`} contentEditable={isEditing} suppressContentEditableWarning>
+                  <p className={`${editableBlockClass}`} {...editableAttributes}>
                     His recovery was complicated by failed back syndrome following the first surgery, eventually necessitating a revision fusion with instrumentation.
                   </p>
                 </ReportSection>
@@ -219,6 +234,7 @@ export default function ClaimReport() {
                       event={event}
                       isFirst={index === 0}
                       isLast={index === timeline.length - 1}
+                      isEditing={isEditing}
                     />
                   ))}
                 </div>
@@ -236,6 +252,7 @@ export default function ClaimReport() {
                       <ContradictionCard
                         key={contradiction.id}
                         contradiction={contradiction}
+                        isEditing={isEditing}
                       />
                     ))}
                   </div>
@@ -251,7 +268,7 @@ export default function ClaimReport() {
                 >
                   <div className="space-y-4">
                     {missingFlags.map((flag) => (
-                      <MissingFlagCard key={flag.id} flag={flag} />
+                      <MissingFlagCard key={flag.id} flag={flag} isEditing={isEditing} />
                     ))}
                   </div>
                 </ReportSection>
@@ -266,7 +283,7 @@ export default function ClaimReport() {
                 >
                   <div className="bg-report-section rounded-lg p-4">
                     <h4 className="font-medium text-foreground mb-2">Accident Mechanism</h4>
-                    <p className={`text-foreground/90 ${isEditing ? 'border border-dashed border-border p-2 rounded hover:border-primary cursor-text' : ''}`} contentEditable={isEditing} suppressContentEditableWarning>
+                    <p className={`text-foreground/90 ${editableBlockClass}`} {...editableAttributes}>
                       Slip on wet floor with axial loading directly onto sacrum.
                     </p>
                   </div>
@@ -279,7 +296,7 @@ export default function ClaimReport() {
                 >
                   <div className="bg-report-section rounded-lg p-4 mb-4">
                     <h4 className="font-medium text-foreground mb-2">Accident Mechanism</h4>
-                    <p className={`text-foreground/90 ${isEditing ? 'border border-dashed border-border p-2 rounded hover:border-primary cursor-text' : ''}`} contentEditable={isEditing} suppressContentEditableWarning>
+                    <p className={`text-foreground/90 ${editableBlockClass}`} {...editableAttributes}>
                       Slip on wet floor with axial loading directly onto sacrum.
                     </p>
                   </div>
@@ -289,7 +306,7 @@ export default function ClaimReport() {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="font-semibold text-success">Score: 92 / 100</span>
                     </div>
-                    <p className="text-foreground/90">
+                    <p className={`text-foreground/90 ${editableBlockClass}`} {...editableAttributes}>
                       MRI-confirmed extrusion and neurological findings strongly support acute traumatic origin.
                     </p>
                   </div>
@@ -311,13 +328,19 @@ export default function ClaimReport() {
                     <table className="w-full">
                       <tbody className="divide-y divide-border">
                         <tr>
-                          <td className="px-4 py-3 text-sm text-foreground">Sinusitis</td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Sinusitis</span>
+                          </td>
                         </tr>
                         <tr>
-                          <td className="px-4 py-3 text-sm text-foreground">Knee surgeries</td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Knee surgeries</span>
+                          </td>
                         </tr>
                         <tr>
-                          <td className="px-4 py-3 text-sm text-foreground">2003 strain</td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>2003 strain</span>
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -331,13 +354,19 @@ export default function ClaimReport() {
                     <table className="w-full">
                       <tbody className="divide-y divide-border">
                         <tr>
-                          <td className="px-4 py-3 text-sm text-foreground">L3-L4 Disc Herniation</td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>L3-L4 Disc Herniation</span>
+                          </td>
                         </tr>
                         <tr>
-                          <td className="px-4 py-3 text-sm text-foreground">Extruded fragment</td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Extruded fragment</span>
+                          </td>
                         </tr>
                         <tr>
-                          <td className="px-4 py-3 text-sm text-foreground">L4 radiculopathy</td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>L4 radiculopathy</span>
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -363,29 +392,69 @@ export default function ClaimReport() {
                       </thead>
                       <tbody className="divide-y divide-border">
                         <tr>
-                          <td className="px-4 py-3 text-sm text-foreground">MRI</td>
-                          <td className="px-4 py-3 text-sm text-foreground">Herniation</td>
-                          <td className="px-4 py-3 text-center"><Badge variant="low">100%</Badge></td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>MRI</span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Herniation</span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <Badge variant="low">
+                              <span className={editableInlineClass} {...editableAttributes}>100%</span>
+                            </Badge>
+                          </td>
                         </tr>
                         <tr>
-                          <td className="px-4 py-3 text-sm text-foreground">Discectomy</td>
-                          <td className="px-4 py-3 text-sm text-foreground">Extrusion</td>
-                          <td className="px-4 py-3 text-center"><Badge variant="low">100%</Badge></td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Discectomy</span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Extrusion</span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <Badge variant="low">
+                              <span className={editableInlineClass} {...editableAttributes}>100%</span>
+                            </Badge>
+                          </td>
                         </tr>
                         <tr>
-                          <td className="px-4 py-3 text-sm text-foreground">Sinus Surgery</td>
-                          <td className="px-4 py-3 text-sm text-foreground">Sinusitis</td>
-                          <td className="px-4 py-3 text-center"><Badge variant="high">0%</Badge></td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Sinus Surgery</span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Sinusitis</span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <Badge variant="high">
+                              <span className={editableInlineClass} {...editableAttributes}>0%</span>
+                            </Badge>
+                          </td>
                         </tr>
                         <tr>
-                          <td className="px-4 py-3 text-sm text-foreground">Fusion</td>
-                          <td className="px-4 py-3 text-sm text-foreground">Instability</td>
-                          <td className="px-4 py-3 text-center"><Badge variant="low">100%</Badge></td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Fusion</span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Instability</span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <Badge variant="low">
+                              <span className={editableInlineClass} {...editableAttributes}>100%</span>
+                            </Badge>
+                          </td>
                         </tr>
                         <tr>
-                          <td className="px-4 py-3 text-sm text-foreground">Hip Injection</td>
-                          <td className="px-4 py-3 text-sm text-foreground">Referred pain</td>
-                          <td className="px-4 py-3 text-center"><Badge variant="medium">Partial</Badge></td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Hip Injection</span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Referred pain</span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <Badge variant="medium">
+                              <span className={editableInlineClass} {...editableAttributes}>Partial</span>
+                            </Badge>
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -404,6 +473,7 @@ export default function ClaimReport() {
                     level="high"
                     label="Strong Causation"
                     description="The fall caused a structural disc extrusion. Subsequent surgeries stem directly from this injury rather than degeneration."
+                    isEditing={isEditing}
                   />
                 </ReportSection>
               )}
@@ -415,46 +485,64 @@ export default function ClaimReport() {
                 title="Medical Billing Review"
               >
                 {/* Billing Overview */}
-                <div id="billing-overview" ref={(el) => (sectionRefs.current['billing-overview'] = el)} className="grid md:grid-cols-3 gap-4 mb-6">
+                <div
+                  id="billing-overview"
+                  ref={(el) => (sectionRefs.current['billing-overview'] = el)}
+                  className="grid md:grid-cols-3 gap-4 mb-6 scroll-mt-24"
+                >
                   <div className="bg-success/10 rounded-lg p-4">
-                    <p className="text-sm text-success mb-1">Accident Related</p>
-                    <p className="text-2xl font-semibold text-success">{formatCurrency(accidentRelatedBilled)}</p>
+                    <p className={`text-sm text-success mb-1 ${editableInlineClass}`} {...editableAttributes}>Accident Related</p>
+                    <p className={`text-2xl font-semibold text-success ${editableInlineClass}`} {...editableAttributes}>
+                      {formatCurrency(accidentRelatedBilled)}
+                    </p>
                   </div>
                   <div className="bg-destructive/10 rounded-lg p-4">
-                    <p className="text-sm text-destructive mb-1">Unrelated</p>
-                    <p className="text-2xl font-semibold text-destructive">{formatCurrency(unrelatedBilled)}</p>
+                    <p className={`text-sm text-destructive mb-1 ${editableInlineClass}`} {...editableAttributes}>Unrelated</p>
+                    <p className={`text-2xl font-semibold text-destructive ${editableInlineClass}`} {...editableAttributes}>
+                      {formatCurrency(unrelatedBilled)}
+                    </p>
                   </div>
                   <div className="bg-secondary rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground mb-1">Total</p>
-                    <p className="text-2xl font-semibold text-foreground">{formatCurrency(totalBilled)}</p>
+                    <p className={`text-sm text-muted-foreground mb-1 ${editableInlineClass}`} {...editableAttributes}>Total</p>
+                    <p className={`text-2xl font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>
+                      {formatCurrency(totalBilled)}
+                    </p>
                   </div>
                 </div>
 
                 {/* Line-Item Billing Review */}
-                <div id="line-item-billing-review" ref={(el) => (sectionRefs.current['line-item-billing-review'] = el)}>
-                  <BillsTable bills={bills} />
+                <div
+                  id="line-item-billing-review"
+                  ref={(el) => (sectionRefs.current['line-item-billing-review'] = el)}
+                  className="scroll-mt-24"
+                >
+                  <BillsTable bills={bills} isEditing={isEditing} />
                 </div>
 
                 {/* Billing Issues & Exceptions */}
-                <div id="billing-issues-exceptions" ref={(el) => (sectionRefs.current['billing-issues-exceptions'] = el)} className="mt-6">
+                <div
+                  id="billing-issues-exceptions"
+                  ref={(el) => (sectionRefs.current['billing-issues-exceptions'] = el)}
+                  className="mt-6 scroll-mt-24"
+                >
                   <h4 className="font-medium text-foreground mb-3">Duplicate & Unsupported Bills</h4>
                   <div className="space-y-3">
                     <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4">
                       <div className="flex items-start gap-3">
                         <Badge variant="high">Duplicate</Badge>
-                        <p className="text-sm text-foreground">Duplicate radiology billing</p>
+                        <p className={`text-sm text-foreground ${editableBlockClass}`} {...editableAttributes}>Duplicate radiology billing</p>
                       </div>
                     </div>
                     <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4">
                       <div className="flex items-start gap-3">
                         <Badge variant="high">Duplicate</Badge>
-                        <p className="text-sm text-foreground">Duplicate pharmacy entries</p>
+                        <p className={`text-sm text-foreground ${editableBlockClass}`} {...editableAttributes}>Duplicate pharmacy entries</p>
                       </div>
                     </div>
                     <div className="bg-warning/5 border border-warning/20 rounded-lg p-4">
                       <div className="flex items-start gap-3">
                         <Badge variant="medium">Mis-coded</Badge>
-                        <p className="text-sm text-foreground">Mis-coded early diagnostic visit</p>
+                        <p className={`text-sm text-foreground ${editableBlockClass}`} {...editableAttributes}>Mis-coded early diagnostic visit</p>
                       </div>
                     </div>
                   </div>
@@ -463,42 +551,50 @@ export default function ClaimReport() {
                 {/* High Impact Bills - Only for Full Report */}
                 {!isMVP && (
                   <>
-                    <div id="high-impact-bills" ref={(el) => (sectionRefs.current['high-impact-bills'] = el)} className="mt-6">
+                    <div
+                      id="high-impact-bills"
+                      ref={(el) => (sectionRefs.current['high-impact-bills'] = el)}
+                      className="mt-6 scroll-mt-24"
+                    >
                       <h4 className="font-medium text-foreground mb-3">High Impact Bills</h4>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
-                          <span className="font-medium text-foreground">Washington Hospital Center</span>
-                          <span className="font-semibold text-foreground">$19,028</span>
+                          <span className={`font-medium text-foreground ${editableInlineClass}`} {...editableAttributes}>Washington Hospital Center</span>
+                          <span className={`font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>$19,028</span>
                         </div>
                         <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
-                          <span className="font-medium text-foreground">Virginia Hospital Center</span>
-                          <span className="font-semibold text-foreground">$15,863.84</span>
+                          <span className={`font-medium text-foreground ${editableInlineClass}`} {...editableAttributes}>Virginia Hospital Center</span>
+                          <span className={`font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>$15,863.84</span>
                         </div>
                         <div className="flex items-center justify-between p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-foreground">Inova Fairfax</span>
+                            <span className={`font-medium text-foreground ${editableInlineClass}`} {...editableAttributes}>Inova Fairfax</span>
                             <Badge variant="high">Unrelated</Badge>
                           </div>
-                          <span className="font-semibold text-foreground">$8,178.05</span>
+                          <span className={`font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>$8,178.05</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Leakage Risk & Next Steps */}
-                    <div id="leakage-risk-next-steps" ref={(el) => (sectionRefs.current['leakage-risk-next-steps'] = el)} className="mt-6 p-4 bg-secondary rounded-lg">
+                    <div
+                      id="leakage-risk-next-steps"
+                      ref={(el) => (sectionRefs.current['leakage-risk-next-steps'] = el)}
+                      className="mt-6 p-4 bg-secondary rounded-lg scroll-mt-24"
+                    >
                       <h4 className="font-medium text-foreground mb-2">Leakage Risk & Next Steps</h4>
                       <ul className="space-y-2 text-foreground/90">
                         <li className="flex items-start gap-2">
                           <span className="text-primary font-bold">•</span>
-                          <span>Remove unrelated sinus surgery</span>
+                          <span className={editableInlineClass} {...editableAttributes}>Remove unrelated sinus surgery</span>
                         </li>
                         <li className="flex items-start gap-2">
                           <span className="text-primary font-bold">•</span>
-                          <span>Peer review 2006 fusion</span>
+                          <span className={editableInlineClass} {...editableAttributes}>Peer review 2006 fusion</span>
                         </li>
                         <li className="flex items-start gap-2">
                           <span className="text-primary font-bold">•</span>
-                          <span>Request missing primary care records</span>
+                          <span className={editableInlineClass} {...editableAttributes}>Request missing primary care records</span>
                         </li>
                       </ul>
                     </div>

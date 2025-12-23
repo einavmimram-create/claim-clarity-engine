@@ -5,9 +5,10 @@ import { AlertTriangle, CheckCircle, Copy } from 'lucide-react';
 interface BillsTableProps {
   bills: BillItem[];
   showRiskOnly?: boolean;
+  isEditing?: boolean;
 }
 
-export function BillsTable({ bills, showRiskOnly = false }: BillsTableProps) {
+export function BillsTable({ bills, showRiskOnly = false, isEditing = false }: BillsTableProps) {
   const filteredBills = showRiskOnly
     ? bills.filter(b => b.riskScore === 'high' || b.riskScore === 'medium')
     : bills;
@@ -19,6 +20,12 @@ export function BillsTable({ bills, showRiskOnly = false }: BillsTableProps) {
       minimumFractionDigits: 0,
     }).format(amount);
   };
+  const editableAttributes = isEditing
+    ? { contentEditable: true, suppressContentEditableWarning: true }
+    : {};
+  const editableClass = isEditing
+    ? 'border border-dashed border-border rounded hover:border-primary cursor-text'
+    : '';
 
   return (
     <div className="border border-border rounded-lg overflow-hidden">
@@ -44,11 +51,15 @@ export function BillsTable({ bills, showRiskOnly = false }: BillsTableProps) {
                 }
               }}
             >
-              <td className="px-4 py-3 text-sm text-foreground">{bill.date}</td>
-              <td className="px-4 py-3 text-sm text-foreground">{bill.provider}</td>
+              <td className="px-4 py-3 text-sm text-foreground">
+                <span className={editableClass} {...editableAttributes}>{bill.date}</span>
+              </td>
+              <td className="px-4 py-3 text-sm text-foreground">
+                <span className={editableClass} {...editableAttributes}>{bill.provider}</span>
+              </td>
               <td className="px-4 py-3 text-sm text-foreground">
                 <div className="flex items-center gap-2">
-                  {bill.description}
+                  <span className={editableClass} {...editableAttributes}>{bill.description}</span>
                   {bill.isDuplicate && (
                     <span className="inline-flex items-center gap-1 text-xs text-destructive">
                       <Copy className="w-3 h-3" />
@@ -58,7 +69,7 @@ export function BillsTable({ bills, showRiskOnly = false }: BillsTableProps) {
                 </div>
               </td>
               <td className="px-4 py-3 text-sm text-foreground text-right font-medium">
-                {formatCurrency(bill.amount)}
+                <span className={editableClass} {...editableAttributes}>{formatCurrency(bill.amount)}</span>
               </td>
               <td className="px-4 py-3 text-center">
                 {bill.isAccidentRelated ? (
@@ -75,7 +86,9 @@ export function BillsTable({ bills, showRiskOnly = false }: BillsTableProps) {
               </td>
               <td className="px-4 py-3 text-center">
                 <Badge variant={bill.riskScore}>
-                  {bill.riskScore.charAt(0).toUpperCase() + bill.riskScore.slice(1)}
+                  <span className={editableClass} {...editableAttributes}>
+                    {bill.riskScore.charAt(0).toUpperCase() + bill.riskScore.slice(1)}
+                  </span>
                 </Badge>
               </td>
             </tr>

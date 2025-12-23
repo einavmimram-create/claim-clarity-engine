@@ -5,14 +5,22 @@ import { EvidenceLink } from './EvidenceLink';
 
 interface ContradictionCardProps {
   contradiction: Contradiction;
+  isEditing?: boolean;
 }
 
-export function ContradictionCard({ contradiction }: ContradictionCardProps) {
+export function ContradictionCard({ contradiction, isEditing = false }: ContradictionCardProps) {
   const typeLabels = {
     diagnosis: 'Diagnosis Conflict',
     notes_vs_procedures: 'Notes vs Procedures',
     narrative_vs_records: 'Narrative vs Records',
   };
+
+  const editableAttributes = isEditing
+    ? { contentEditable: true, suppressContentEditableWarning: true }
+    : {};
+  const editableClass = isEditing
+    ? 'border border-dashed border-border rounded hover:border-primary cursor-text'
+    : '';
 
   return (
     <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4">
@@ -22,17 +30,23 @@ export function ContradictionCard({ contradiction }: ContradictionCardProps) {
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <span className="font-medium text-foreground">
+            <span className={`font-medium text-foreground ${editableClass}`} {...editableAttributes}>
               {typeLabels[contradiction.type]}
             </span>
             <Badge variant={contradiction.severity}>
-              {contradiction.severity.charAt(0).toUpperCase() + contradiction.severity.slice(1)} Severity
+              <span className={editableClass} {...editableAttributes}>
+                {contradiction.severity.charAt(0).toUpperCase() + contradiction.severity.slice(1)} Severity
+              </span>
             </Badge>
           </div>
-          <p className="text-foreground/90 mb-3">{contradiction.description}</p>
+          <p className={`text-foreground/90 mb-3 ${editableClass}`} {...editableAttributes}>
+            {contradiction.description}
+          </p>
           <div className="flex flex-wrap gap-2">
             {contradiction.sources.map((source, index) => (
-              <EvidenceLink key={index} source={source} />
+              <div key={index} className={editableClass} {...editableAttributes}>
+                <EvidenceLink source={source} />
+              </div>
             ))}
           </div>
         </div>

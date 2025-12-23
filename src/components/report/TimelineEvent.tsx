@@ -9,9 +9,10 @@ interface TimelineEventProps {
   event: MedicalEvent;
   isFirst?: boolean;
   isLast?: boolean;
+  isEditing?: boolean;
 }
 
-export function TimelineEvent({ event, isFirst, isLast }: TimelineEventProps) {
+export function TimelineEvent({ event, isFirst, isLast, isEditing = false }: TimelineEventProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Derive expanded content from existing event data or use provided fields
@@ -26,6 +27,12 @@ export function TimelineEvent({ event, isFirst, isLast }: TimelineEventProps) {
   const isKeyDate = event.isKeyDate || false;
   const needsReview = event.needsReview || false;
   const fileIds = event.fileIds || (event.sourceDocument ? [event.sourceDocument] : []);
+  const editableAttributes = isEditing
+    ? { contentEditable: true, suppressContentEditableWarning: true }
+    : {};
+  const editableClass = isEditing
+    ? 'border border-dashed border-border rounded hover:border-primary cursor-text'
+    : '';
 
   return (
     <div className="relative pl-8 pb-6 last:pb-0">
@@ -63,23 +70,25 @@ export function TimelineEvent({ event, isFirst, isLast }: TimelineEventProps) {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
               <Calendar className="w-4 h-4" />
-              {event.date}
+              <span className={editableClass} {...editableAttributes}>{event.date}</span>
             </span>
             <span className="flex items-center gap-1.5">
               <User className="w-4 h-4" />
-              {event.provider}
+              <span className={editableClass} {...editableAttributes}>{event.provider}</span>
             </span>
             <span className="flex items-center gap-1.5">
               <Stethoscope className="w-4 h-4" />
-              {event.specialty}
+              <span className={editableClass} {...editableAttributes}>{event.specialty}</span>
             </span>
           </div>
           <span className="text-xs font-medium bg-secondary px-2 py-1 rounded">
-            {event.eventType}
+            <span className={editableClass} {...editableAttributes}>{event.eventType}</span>
           </span>
         </div>
         
-        <p className="text-foreground mb-3">{event.description}</p>
+        <p className={`text-foreground mb-3 ${editableClass}`} {...editableAttributes}>
+          {event.description}
+        </p>
         
         <EvidenceLink source={event.sourceDocument} pageRef={event.sourcePageRef} />
       </div>
@@ -95,7 +104,9 @@ export function TimelineEvent({ event, isFirst, isLast }: TimelineEventProps) {
           {/* Narrative Summary */}
           <div className="mb-4">
             <h4 className="text-sm font-medium text-foreground mb-2">Narrative Event Summary</h4>
-            <p className="text-sm text-foreground/90">{narrativeSummary}</p>
+            <p className={`text-sm text-foreground/90 ${editableClass}`} {...editableAttributes}>
+              {narrativeSummary}
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
