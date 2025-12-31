@@ -4,6 +4,7 @@ import { ReportType } from '@/utils/reportData';
 
 interface ReportSidebarProps {
   reportType?: ReportType;
+  isFutureReport?: boolean;
 }
 
 interface Subsection {
@@ -17,7 +18,7 @@ interface SectionWithSubsections {
   subsections?: Subsection[];
 }
 
-export function ReportSidebar({ reportType }: ReportSidebarProps) {
+export function ReportSidebar({ reportType, isFutureReport = false }: ReportSidebarProps) {
   const isMVP = reportType === 'mvp';
   const [activeSection, setActiveSection] = useState<string>('executive-summary');
   
@@ -50,7 +51,7 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
     ? baseBillingSubsections
     : [...baseBillingSubsections, ...fullReportBillingSubsections];
 
-  // New Next Steps subsections
+  // Next Steps subsections - only for Future Report
   const nextStepsSubsections: Subsection[] = [
     { id: 'what-to-do-now', title: 'What To Do Now' },
     { id: 'leakage-risk', title: 'Leakage Risk' },
@@ -80,12 +81,12 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
       title: 'Medical Billing Review',
       subsections: billingSubsections,
     },
-    // Add Next Steps section for full reports
-    ...(isMVP ? [] : [{
+    // Add Next Steps section only for Future Report
+    ...(isFutureReport ? [{
       id: 'next-steps',
       title: 'Next Steps',
       subsections: nextStepsSubsections,
-    }]),
+    }] : []),
   ];
 
   // Get all subsection IDs for scroll tracking
@@ -160,7 +161,7 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
     handleScroll();
     
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isMVP]);
+  }, [isMVP, isFutureReport]);
 
   const handleClick = (sectionId: string) => {
     setActiveSection(sectionId);
@@ -168,7 +169,10 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
 
   return (
     <nav className="w-64 flex-shrink-0">
-      <div className="sticky top-6 space-y-4">
+      <div className={cn(
+        "sticky top-6 space-y-4",
+        isFutureReport && "max-h-[calc(100vh-3rem)] overflow-y-auto"
+      )}>
         <div className="h-16"></div>
         <ul className="space-y-1">
           {structuredSections.map((section) => {

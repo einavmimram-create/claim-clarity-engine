@@ -95,9 +95,9 @@ export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
             <button
               key={driver.id}
               onClick={() => setSelectedDriver(driver)}
-              className={`absolute w-6 h-6 rounded-full ${riskColors[driver.riskScore]} border-2 
+              className={`absolute w-3 h-3 rounded-full ${riskColors[driver.riskScore]} border-2 
                 cursor-pointer transition-all duration-200 hover:scale-125 hover:shadow-lg
-                animate-pulse hover:animate-none z-10 -translate-x-1/2 -translate-y-1/2`}
+                z-10 -translate-x-1/2 -translate-y-1/2`}
               style={{ top: driver.position.top, left: driver.position.left }}
               title={driver.bodyPart}
             />
@@ -109,15 +109,15 @@ export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
       <div className="mt-4 flex justify-center gap-4 text-xs">
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-success" />
-          <span className="text-muted-foreground">Low</span>
+          <span className="text-muted-foreground">Defensible</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-warning" />
-          <span className="text-muted-foreground">Medium</span>
+          <span className="text-muted-foreground">May escalate</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-destructive" />
-          <span className="text-muted-foreground">High</span>
+          <span className="text-muted-foreground">Primary driver</span>
         </div>
       </div>
 

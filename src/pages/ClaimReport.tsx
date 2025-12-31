@@ -42,6 +42,7 @@ export default function ClaimReport() {
   const reportTitle = getReportTitle(claim);
   const reportType = getReportType(claim);
   const isMVP = reportType === 'mvp';
+  const isFutureReport = claim.id === '3' || reportTitle.includes('Future Report');
 
   const editableAttributes: Pick<HTMLAttributes<HTMLElement>, 'contentEditable' | 'suppressContentEditableWarning'> =
     isEditing
@@ -171,7 +172,7 @@ export default function ClaimReport() {
       {/* Report Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex gap-8">
-          <ReportSidebar reportType={reportType} />
+          <ReportSidebar reportType={reportType} isFutureReport={isFutureReport} />
           <div className="flex-1 max-w-4xl">
             <div className={`bg-report-bg rounded-xl border border-border p-8 shadow-card ${isEditing ? 'ring-2 ring-primary/20' : ''}`}>
               {isEditing && (
@@ -586,8 +587,8 @@ export default function ClaimReport() {
                 )}
               </ReportSection>
 
-              {/* NEW: Next Steps Section - Only for Full Report */}
-              {!isMVP && (
+              {/* Next Steps Section - Only for Future Report */}
+              {isFutureReport && (
                 <ReportSection
                   ref={(el) => (sectionRefs.current['next-steps'] = el)}
                   id="next-steps"
@@ -615,7 +616,7 @@ export default function ClaimReport() {
                     className="mt-8 scroll-mt-24"
                   >
                     <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                      ⭐ Litigation Exposure Score
+                      Litigation Exposure Score
                     </h3>
                     <LitigationExposureScore isEditing={isEditing} />
                   </div>
@@ -627,7 +628,7 @@ export default function ClaimReport() {
                     className="mt-8 scroll-mt-24"
                   >
                     <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                      ⭐ Reserve Guidance Range
+                      Reserve Guidance Range
                     </h3>
                     <ReserveGuidance isEditing={isEditing} />
                   </div>

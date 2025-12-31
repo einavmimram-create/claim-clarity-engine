@@ -58,6 +58,11 @@ export function getReportType(claim: Claim): ReportType {
  * Gets the report title based on claim and report type
  */
 export function getReportTitle(claim: Claim): string {
+  // Claim ID '3' (Williams Slip & Fall) -> Future Report
+  if (claim.id === '3' || (claim.name && claim.name.includes('Williams'))) {
+    return 'Future Report: Luke Frazza';
+  }
+  
   const reportType = getReportType(claim);
   const reportTypeLabel = reportType === 'full' ? 'Full Report' : 'MVP Report';
   return `${reportTypeLabel}: Luke Frazza`;
