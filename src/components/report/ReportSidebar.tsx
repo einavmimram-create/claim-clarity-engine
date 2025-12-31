@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { ReportType } from '@/utils/reportData';
-import { reportSections } from '@/data/mockClaims';
 
 interface ReportSidebarProps {
   reportType?: ReportType;
@@ -24,7 +23,7 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
   
   // Define section hierarchy
   const medicalNarrativeSubsections: Subsection[] = [
-    { id: 'medical-narrative', title: 'Claimant Medical Summary' }, // Links to medical-narrative section
+    { id: 'medical-narrative', title: 'Claimant Medical Summary' },
     { id: 'medical-timeline', title: 'Medical Timeline' },
     { id: 'contradictions', title: 'Contradictions & Inconsistencies' },
     { id: 'missing-docs', title: 'Missing Documentation' },
@@ -45,12 +44,19 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
 
   const fullReportBillingSubsections: Subsection[] = [
     { id: 'high-impact-bills', title: 'High Impact Bills' },
-    { id: 'leakage-risk-next-steps', title: 'Leakage Risk & Next Steps' },
   ];
 
   const billingSubsections = isMVP
     ? baseBillingSubsections
     : [...baseBillingSubsections, ...fullReportBillingSubsections];
+
+  // New Next Steps subsections
+  const nextStepsSubsections: Subsection[] = [
+    { id: 'what-to-do-now', title: 'What To Do Now' },
+    { id: 'leakage-risk', title: 'Leakage Risk' },
+    { id: 'litigation-exposure', title: 'Litigation Exposure Score' },
+    { id: 'reserve-guidance', title: 'Reserve Guidance' },
+  ];
 
   // Build structured sections
   const structuredSections: SectionWithSubsections[] = [
@@ -74,6 +80,12 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
       title: 'Medical Billing Review',
       subsections: billingSubsections,
     },
+    // Add Next Steps section for full reports
+    ...(isMVP ? [] : [{
+      id: 'next-steps',
+      title: 'Next Steps',
+      subsections: nextStepsSubsections,
+    }]),
   ];
 
   // Get all subsection IDs for scroll tracking
@@ -101,7 +113,7 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
     const allSubsectionIds = getAllSubsectionIds();
     
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 200; // Account for sticky header
+      const scrollPosition = window.scrollY + 200;
       
       let bestMatch: { id: string; top: number } | null = null;
       
@@ -145,7 +157,7 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
     };
 
     window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Check initial position
+    handleScroll();
     
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isMVP]);
@@ -157,7 +169,6 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
   return (
     <nav className="w-64 flex-shrink-0">
       <div className="sticky top-6 space-y-4">
-        {/* 2 empty lines at the top */}
         <div className="h-16"></div>
         <ul className="space-y-1">
           {structuredSections.map((section) => {
@@ -211,4 +222,3 @@ export function ReportSidebar({ reportType }: ReportSidebarProps) {
     </nav>
   );
 }
-
