@@ -11,6 +11,10 @@ import { BillsTable } from '@/components/report/BillsTable';
 import { ConfidenceIndicator } from '@/components/report/ConfidenceIndicator';
 import { EvidenceLink } from '@/components/report/EvidenceLink';
 import { ExportMenu } from '@/components/report/ExportMenu';
+import { ExposureDriversPanel } from '@/components/report/ExposureDriversPanel';
+import { LitigationExposureScore } from '@/components/report/LitigationExposureScore';
+import { ReserveGuidance } from '@/components/report/ReserveGuidance';
+import { NextStepsSection } from '@/components/report/NextStepsSection';
 import { AddDocumentsModal } from '@/components/claims/AddDocumentsModal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,21 +32,17 @@ export default function ClaimReport() {
 
   const claim = mockClaims.find((c) => c.id === id) || mockClaims[0];
   
-  // Get claim-specific report data (isolated per claim)
   const reportData = getClaimReportData(claim.id);
   
-  // Store report data in state to ensure edits are isolated per claim
   const [timeline, setTimeline] = useState<MedicalEvent[]>(reportData.timeline);
   const [contradictions, setContradictions] = useState<Contradiction[]>(reportData.contradictions);
   const [missingFlags, setMissingFlags] = useState<MissingFlag[]>(reportData.missingFlags);
   const [bills, setBills] = useState<BillItem[]>(reportData.bills);
 
-  // Get dynamic report title based on claim
   const reportTitle = getReportTitle(claim);
   const reportType = getReportType(claim);
   const isMVP = reportType === 'mvp';
 
-  // Shared inline editing helpers
   const editableAttributes: Pick<HTMLAttributes<HTMLElement>, 'contentEditable' | 'suppressContentEditableWarning'> =
     isEditing
       ? {
@@ -57,8 +57,6 @@ export default function ClaimReport() {
     ? 'border border-dashed border-border rounded hover:border-primary cursor-text'
     : '';
 
-  // Calculate billing totals from current bills state
-  // For MVP, use fixed totals as specified
   const accidentRelatedBilled = isMVP 
     ? 33323.72 
     : bills.filter(b => b.isAccidentRelated).reduce((sum, b) => sum + b.amount, 0);
@@ -77,7 +75,6 @@ export default function ClaimReport() {
     }).format(amount);
   };
 
-  // Reload report data when claim ID changes (ensures isolation between claims)
   useEffect(() => {
     if (id && claim.id) {
       const newReportData = getClaimReportData(claim.id);
@@ -183,23 +180,35 @@ export default function ClaimReport() {
                 </div>
               )}
 
-              {/* Executive Summary */}
+              {/* Executive Summary with Exposure Drivers Panel */}
               <ReportSection
                 ref={(el) => (sectionRefs.current['executive-summary'] = el)}
                 id="executive-summary"
                 title="Executive Summary"
               >
-                <p className={`mb-4 ${editableBlockClass}`} {...editableAttributes}>
-                  This report provides a comprehensive analysis of the medical treatment and associated costs for Luke Frazza following a slip-and-fall accident on January 23, 2005. The claimant, a professional photographer, suffered an acute L3-L4 disc herniation with an extruded fragment. His clinical course included a failed initial discectomy in April 2005, leading to a complex 360-degree revision fusion in June 2006.
-                </p>
+                <div className={`flex gap-6 ${isMVP ? '' : 'flex-col lg:flex-row'}`}>
+                  {/* Left side: Summary text */}
+                  <div className={isMVP ? 'flex-1' : 'flex-1 lg:w-2/3'}>
+                    <p className={`mb-4 ${editableBlockClass}`} {...editableAttributes}>
+                      This report provides a comprehensive analysis of the medical treatment and associated costs for Luke Frazza following a slip-and-fall accident on January 23, 2005. The claimant, a professional photographer, suffered an acute L3-L4 disc herniation with an extruded fragment. His clinical course included a failed initial discectomy in April 2005, leading to a complex 360-degree revision fusion in June 2006.
+                    </p>
 
-                <p className={`mb-4 ${editableBlockClass}`} {...editableAttributes}>
-                  While the claimant had a prior history of a lumbosacral strain in 2003 and unrelated sinus surgery in 2004, the clinical evidence supports the 2005 fall as the primary cause of his structural spinal injury. The total reviewed billing is {formatCurrency(totalBilled)}, with {formatCurrency(accidentRelatedBilled)} deemed accident-related and {formatCurrency(unrelatedBilled)} identified as unrelated to the trauma.
-                </p>
+                    <p className={`mb-4 ${editableBlockClass}`} {...editableAttributes}>
+                      While the claimant had a prior history of a lumbosacral strain in 2003 and unrelated sinus surgery in 2004, the clinical evidence supports the 2005 fall as the primary cause of his structural spinal injury. The total reviewed billing is {formatCurrency(totalBilled)}, with {formatCurrency(accidentRelatedBilled)} deemed accident-related and {formatCurrency(unrelatedBilled)} identified as unrelated to the trauma.
+                    </p>
 
-                <div className="mt-4 flex gap-2">
-                  <EvidenceLink source="Incident Report" pageRef="INC-001" />
-                  <EvidenceLink source="MRI Report" pageRef="MRI-001" />
+                    <div className="mt-4 flex gap-2">
+                      <EvidenceLink source="Incident Report" pageRef="INC-001" />
+                      <EvidenceLink source="MRI Report" pageRef="MRI-001" />
+                    </div>
+                  </div>
+
+                  {/* Right side: Exposure Drivers Panel (Full report only) */}
+                  {!isMVP && (
+                    <div className="lg:w-1/3">
+                      <ExposureDriversPanel isEditing={isEditing} />
+                    </div>
+                  )}
                 </div>
               </ReportSection>
 
@@ -274,7 +283,7 @@ export default function ClaimReport() {
                 </ReportSection>
               )}
 
-              {/* Causation Analysis - Full section for Full Report, only Accident Mechanism for MVP */}
+              {/* Causation Analysis */}
               {isMVP ? (
                 <ReportSection
                   ref={(el) => (sectionRefs.current['causation-analysis'] = el)}
@@ -550,57 +559,80 @@ export default function ClaimReport() {
 
                 {/* High Impact Bills - Only for Full Report */}
                 {!isMVP && (
-                  <>
-                    <div
-                      id="high-impact-bills"
-                      ref={(el) => (sectionRefs.current['high-impact-bills'] = el)}
-                      className="mt-6 scroll-mt-24"
-                    >
-                      <h4 className="font-medium text-foreground mb-3">High Impact Bills</h4>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
-                          <span className={`font-medium text-foreground ${editableInlineClass}`} {...editableAttributes}>Washington Hospital Center</span>
-                          <span className={`font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>$19,028</span>
+                  <div
+                    id="high-impact-bills"
+                    ref={(el) => (sectionRefs.current['high-impact-bills'] = el)}
+                    className="mt-6 scroll-mt-24"
+                  >
+                    <h4 className="font-medium text-foreground mb-3">High Impact Bills</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
+                        <span className={`font-medium text-foreground ${editableInlineClass}`} {...editableAttributes}>Washington Hospital Center</span>
+                        <span className={`font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>$19,028</span>
+                      </div>
+                      <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
+                        <span className={`font-medium text-foreground ${editableInlineClass}`} {...editableAttributes}>Virginia Hospital Center</span>
+                        <span className={`font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>$15,863.84</span>
+                      </div>
+                      <div className="flex items-center justify-between p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <span className={`font-medium text-foreground ${editableInlineClass}`} {...editableAttributes}>Inova Fairfax</span>
+                          <Badge variant="high">Unrelated</Badge>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
-                          <span className={`font-medium text-foreground ${editableInlineClass}`} {...editableAttributes}>Virginia Hospital Center</span>
-                          <span className={`font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>$15,863.84</span>
-                        </div>
-                        <div className="flex items-center justify-between p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <span className={`font-medium text-foreground ${editableInlineClass}`} {...editableAttributes}>Inova Fairfax</span>
-                            <Badge variant="high">Unrelated</Badge>
-                          </div>
-                          <span className={`font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>$8,178.05</span>
-                        </div>
+                        <span className={`font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>$8,178.05</span>
                       </div>
                     </div>
-
-                    {/* Leakage Risk & Next Steps */}
-                    <div
-                      id="leakage-risk-next-steps"
-                      ref={(el) => (sectionRefs.current['leakage-risk-next-steps'] = el)}
-                      className="mt-6 p-4 bg-secondary rounded-lg scroll-mt-24"
-                    >
-                      <h4 className="font-medium text-foreground mb-2">Leakage Risk & Next Steps</h4>
-                      <ul className="space-y-2 text-foreground/90">
-                        <li className="flex items-start gap-2">
-                          <span className="text-primary font-bold">•</span>
-                          <span className={editableInlineClass} {...editableAttributes}>Remove unrelated sinus surgery</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-primary font-bold">•</span>
-                          <span className={editableInlineClass} {...editableAttributes}>Peer review 2006 fusion</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-primary font-bold">•</span>
-                          <span className={editableInlineClass} {...editableAttributes}>Request missing primary care records</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </>
+                  </div>
                 )}
               </ReportSection>
+
+              {/* NEW: Next Steps Section - Only for Full Report */}
+              {!isMVP && (
+                <ReportSection
+                  ref={(el) => (sectionRefs.current['next-steps'] = el)}
+                  id="next-steps"
+                  title="Next Steps"
+                >
+                  {/* What To Do Now & Leakage Risk */}
+                  <div
+                    id="what-to-do-now"
+                    ref={(el) => (sectionRefs.current['what-to-do-now'] = el)}
+                    className="scroll-mt-24"
+                  >
+                    <div
+                      id="leakage-risk"
+                      ref={(el) => (sectionRefs.current['leakage-risk'] = el)}
+                      className="scroll-mt-24"
+                    >
+                      <NextStepsSection isEditing={isEditing} />
+                    </div>
+                  </div>
+
+                  {/* Litigation Exposure Score */}
+                  <div
+                    id="litigation-exposure"
+                    ref={(el) => (sectionRefs.current['litigation-exposure'] = el)}
+                    className="mt-8 scroll-mt-24"
+                  >
+                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                      ⭐ Litigation Exposure Score
+                    </h3>
+                    <LitigationExposureScore isEditing={isEditing} />
+                  </div>
+
+                  {/* Reserve Guidance */}
+                  <div
+                    id="reserve-guidance"
+                    ref={(el) => (sectionRefs.current['reserve-guidance'] = el)}
+                    className="mt-8 scroll-mt-24"
+                  >
+                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                      ⭐ Reserve Guidance Range
+                    </h3>
+                    <ReserveGuidance isEditing={isEditing} />
+                  </div>
+                </ReportSection>
+              )}
             </div>
           </div>
         </div>
