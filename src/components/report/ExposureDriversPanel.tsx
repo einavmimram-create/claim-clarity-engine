@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { EvidenceLink } from './EvidenceLink';
@@ -24,7 +24,7 @@ const exposureDrivers: ExposureDriver[] = [
     evidenceSource: 'MRI Report',
     evidencePageRef: 'MRI-001',
     riskScore: 'high',
-    position: { top: '42%', left: '50%' },
+    position: { top: '38%', left: '50%' }, // Belly area - L3-L4 region
   },
   {
     id: 'left-leg',
@@ -34,7 +34,7 @@ const exposureDrivers: ExposureDriver[] = [
     evidenceSource: 'Neurology Consult',
     evidencePageRef: 'NEURO-003',
     riskScore: 'high',
-    position: { top: '75%', left: '45%' },
+    position: { top: '65%', left: '40%' }, // Left thigh/upper leg area (left side of body)
   },
   {
     id: 'sinus',
@@ -44,7 +44,7 @@ const exposureDrivers: ExposureDriver[] = [
     evidenceSource: 'ENT Records',
     evidencePageRef: 'ENT-001',
     riskScore: 'low',
-    position: { top: '8%', left: '50%' },
+    position: { top: '6%', left: '50%' }, // Forehead area
   },
   {
     id: 'lower-back',
@@ -54,7 +54,7 @@ const exposureDrivers: ExposureDriver[] = [
     evidenceSource: 'Primary Care Records',
     evidencePageRef: 'PCP-2003',
     riskScore: 'medium',
-    position: { top: '38%', left: '50%' },
+    position: { top: '36%', left: '48%' }, // Belly area - lower back general
   },
 ];
 
@@ -76,6 +76,7 @@ interface ExposureDriversPanelProps {
 
 export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
   const [selectedDriver, setSelectedDriver] = useState<ExposureDriver | null>(null);
+  const [hoveredDriver, setHoveredDriver] = useState<ExposureDriver | null>(null);
 
   return (
     <div className="relative bg-secondary/30 rounded-xl border border-border p-4">
@@ -91,17 +92,103 @@ export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
           />
           
           {/* Clickable markers */}
-          {exposureDrivers.map((driver) => (
-            <button
-              key={driver.id}
-              onClick={() => setSelectedDriver(driver)}
-              className={`absolute w-3 h-3 rounded-full ${riskColors[driver.riskScore]} border-2 
-                cursor-pointer transition-all duration-200 hover:scale-125 hover:shadow-lg
-                z-10 -translate-x-1/2 -translate-y-1/2`}
-              style={{ top: driver.position.top, left: driver.position.left }}
-              title={driver.bodyPart}
-            />
-          ))}
+          {exposureDrivers.map((driver) => {
+            const isSelected = selectedDriver?.id === driver.id;
+            const isHovered = hoveredDriver?.id === driver.id;
+            
+            return (
+              <Fragment key={driver.id}>
+                <button
+                  onClick={() => {
+                    // Toggle: if already selected, deselect; otherwise select
+                    setSelectedDriver(isSelected ? null : driver);
+                  }}
+                  onMouseEnter={() => {
+                    // Only show hover if not already selected
+                    if (!selectedDriver) {
+                      setHoveredDriver(driver);
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    // Only clear hover if not selected
+                    if (!isSelected) {
+                      setHoveredDriver(null);
+                    }
+                  }}
+                  className={`absolute w-3 h-3 rounded-full ${riskColors[driver.riskScore]} border-2 
+                    cursor-pointer transition-all duration-200 hover:scale-125 hover:shadow-lg
+                    z-20 -translate-x-1/2 -translate-y-1/2 ${isSelected ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+                  style={{ top: driver.position.top, left: driver.position.left }}
+                  title={driver.bodyPart}
+                />
+                
+                {/* Inline Detail Card - positioned next to the dot */}
+                {(isSelected || (isHovered && !selectedDriver)) && (
+                  <div 
+                    className="absolute z-30 bg-card border border-border rounded-xl shadow-lg max-w-xs w-[280px] p-4 animate-in fade-in zoom-in-95"
+                    style={{
+                      top: driver.position.top,
+                      left: `calc(${driver.position.left} + 12px)`,
+                      transform: 'translateY(-50%)',
+                      // If card would overflow right, position to the left of the dot instead
+                      ...(parseFloat(driver.position.left) > 60 ? {
+                        left: `calc(${driver.position.left} - 292px)`, // 280px width + 12px offset
+                      } : {}),
+                    }}
+                    onMouseEnter={() => {
+                      // Keep hovered when hovering over the card itself
+                      if (!selectedDriver) {
+                        setHoveredDriver(driver);
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      // Only clear hover if not selected
+                      if (!isSelected) {
+                        setHoveredDriver(null);
+                      }
+                    }}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground text-sm">{driver.bodyPart}</h3>
+                        <Badge variant={riskBadgeVariants[driver.riskScore]} className="mt-1 text-xs">
+                          {driver.riskScore.charAt(0).toUpperCase() + driver.riskScore.slice(1)} Risk
+                        </Badge>
+                      </div>
+                      {isSelected && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedDriver(null);
+                          }}
+                          className="p-1 hover:bg-secondary rounded-lg transition-colors ml-2 flex-shrink-0"
+                        >
+                          <X className="w-4 h-4 text-muted-foreground" />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Driver</p>
+                        <p className="text-sm text-foreground">{driver.driver}</p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Why It Matters</p>
+                        <p className="text-sm text-foreground">{driver.whyItMatters}</p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Evidence Source</p>
+                        <EvidenceLink source={driver.evidenceSource} pageRef={driver.evidencePageRef} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </Fragment>
+            );
+          })}
         </div>
       </div>
 
@@ -120,45 +207,6 @@ export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
           <span className="text-muted-foreground">Primary driver</span>
         </div>
       </div>
-
-      {/* Detail Card Modal */}
-      {selectedDriver && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-          <div className="bg-card border border-border rounded-xl shadow-lg max-w-md w-full mx-4 p-6 animate-in fade-in zoom-in-95">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="font-semibold text-foreground">{selectedDriver.bodyPart}</h3>
-                <Badge variant={riskBadgeVariants[selectedDriver.riskScore]} className="mt-1">
-                  {selectedDriver.riskScore.charAt(0).toUpperCase() + selectedDriver.riskScore.slice(1)} Risk
-                </Badge>
-              </div>
-              <button
-                onClick={() => setSelectedDriver(null)}
-                className="p-1 hover:bg-secondary rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-muted-foreground" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Driver</p>
-                <p className="text-sm text-foreground">{selectedDriver.driver}</p>
-              </div>
-
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Why It Matters</p>
-                <p className="text-sm text-foreground">{selectedDriver.whyItMatters}</p>
-              </div>
-
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Evidence Source</p>
-                <EvidenceLink source={selectedDriver.evidenceSource} pageRef={selectedDriver.evidencePageRef} />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
