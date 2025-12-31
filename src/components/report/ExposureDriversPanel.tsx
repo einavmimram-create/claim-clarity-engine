@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { EvidenceLink } from './EvidenceLink';
+import humanBodyImage from '@/assets/human-body-anatomy.jpg';
 
 interface ExposureDriver {
   id: string;
@@ -33,7 +34,7 @@ const exposureDrivers: ExposureDriver[] = [
     evidenceSource: 'Neurology Consult',
     evidencePageRef: 'NEURO-003',
     riskScore: 'high',
-    position: { top: '70%', left: '45%' },
+    position: { top: '75%', left: '45%' },
   },
   {
     id: 'sinus',
@@ -43,7 +44,7 @@ const exposureDrivers: ExposureDriver[] = [
     evidenceSource: 'ENT Records',
     evidencePageRef: 'ENT-001',
     riskScore: 'low',
-    position: { top: '15%', left: '50%' },
+    position: { top: '8%', left: '50%' },
   },
   {
     id: 'lower-back',
@@ -80,36 +81,21 @@ export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
     <div className="relative bg-secondary/30 rounded-xl border border-border p-4">
       <h4 className="text-sm font-medium text-muted-foreground mb-4">Exposure Drivers</h4>
       
-      {/* Body Silhouette Container */}
-      <div className="relative w-full h-[320px] flex items-center justify-center">
-        {/* Simple body silhouette using CSS */}
-        <div className="relative w-32 h-72">
-          {/* Head */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-muted-foreground/20 border-2 border-muted-foreground/30" />
+      {/* Body Image Container */}
+      <div className="relative w-full flex items-center justify-center">
+        <div className="relative">
+          <img 
+            src={humanBodyImage} 
+            alt="Human body anatomy for exposure mapping" 
+            className="h-[400px] w-auto object-contain"
+          />
           
-          {/* Neck */}
-          <div className="absolute top-10 left-1/2 -translate-x-1/2 w-4 h-3 bg-muted-foreground/20" />
-          
-          {/* Torso */}
-          <div className="absolute top-12 left-1/2 -translate-x-1/2 w-16 h-24 bg-muted-foreground/20 rounded-t-lg border-2 border-muted-foreground/30" />
-          
-          {/* Arms */}
-          <div className="absolute top-14 left-0 w-3 h-20 bg-muted-foreground/20 rounded-full border-2 border-muted-foreground/30 -translate-x-1" />
-          <div className="absolute top-14 right-0 w-3 h-20 bg-muted-foreground/20 rounded-full border-2 border-muted-foreground/30 translate-x-1" />
-          
-          {/* Lower torso/hips */}
-          <div className="absolute top-36 left-1/2 -translate-x-1/2 w-14 h-8 bg-muted-foreground/20 rounded-b-lg border-2 border-t-0 border-muted-foreground/30" />
-          
-          {/* Legs */}
-          <div className="absolute top-44 left-1/2 -translate-x-[70%] w-5 h-24 bg-muted-foreground/20 rounded-b-lg border-2 border-muted-foreground/30" />
-          <div className="absolute top-44 left-1/2 -translate-x-[30%] w-5 h-24 bg-muted-foreground/20 rounded-b-lg border-2 border-muted-foreground/30" />
-
           {/* Clickable markers */}
           {exposureDrivers.map((driver) => (
             <button
               key={driver.id}
               onClick={() => setSelectedDriver(driver)}
-              className={`absolute w-5 h-5 rounded-full ${riskColors[driver.riskScore]} border-2 
+              className={`absolute w-6 h-6 rounded-full ${riskColors[driver.riskScore]} border-2 
                 cursor-pointer transition-all duration-200 hover:scale-125 hover:shadow-lg
                 animate-pulse hover:animate-none z-10 -translate-x-1/2 -translate-y-1/2`}
               style={{ top: driver.position.top, left: driver.position.left }}
@@ -117,21 +103,21 @@ export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
             />
           ))}
         </div>
+      </div>
 
-        {/* Legend */}
-        <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-4 text-xs">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-success" />
-            <span className="text-muted-foreground">Low</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-warning" />
-            <span className="text-muted-foreground">Medium</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-destructive" />
-            <span className="text-muted-foreground">High</span>
-          </div>
+      {/* Legend */}
+      <div className="mt-4 flex justify-center gap-4 text-xs">
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-3 rounded-full bg-success" />
+          <span className="text-muted-foreground">Low</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-3 rounded-full bg-warning" />
+          <span className="text-muted-foreground">Medium</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-3 rounded-full bg-destructive" />
+          <span className="text-muted-foreground">High</span>
         </div>
       </div>
 
