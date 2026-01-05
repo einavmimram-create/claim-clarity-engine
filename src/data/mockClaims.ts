@@ -9,7 +9,7 @@ export const mockClaims: Claim[] = [
     createdAt: new Date('2024-01-10'),
     fileCount: 47,
     totalBilled: 287450,
-    accidentDate: '2023-06-15',
+    accidentDate: '2005-01-23',
   },
   {
     id: '2',

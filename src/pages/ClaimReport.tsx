@@ -15,6 +15,8 @@ import { ExposureDriversPanel } from '@/components/report/ExposureDriversPanel';
 import { LitigationExposureScore } from '@/components/report/LitigationExposureScore';
 import { ReserveGuidance } from '@/components/report/ReserveGuidance';
 import { NextStepsSection } from '@/components/report/NextStepsSection';
+import { ElyonChat } from '@/components/report/ElyonChat';
+import { ElyonAnalysisSection } from '@/components/report/ElyonAnalysisSection';
 import { AddDocumentsModal } from '@/components/claims/AddDocumentsModal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -38,6 +40,14 @@ export default function ClaimReport() {
   const [contradictions, setContradictions] = useState<Contradiction[]>(reportData.contradictions);
   const [missingFlags, setMissingFlags] = useState<MissingFlag[]>(reportData.missingFlags);
   const [bills, setBills] = useState<BillItem[]>(reportData.bills);
+  
+  // Dynamic Elyon analysis sections
+  interface ElyonSection {
+    id: string;
+    title: string;
+    content: string;
+  }
+  const [elyonSections, setElyonSections] = useState<ElyonSection[]>([]);
 
   const reportTitle = getReportTitle(claim);
   const reportType = getReportType(claim);
@@ -100,6 +110,31 @@ export default function ClaimReport() {
     toast({
       title: 'Report saved',
       description: 'Your changes have been saved successfully.',
+    });
+  };
+
+  const handleInsertElyonSection = (title: string, content: string) => {
+    const newSection: ElyonSection = {
+      id: `elyon-${Date.now()}`,
+      title,
+      content,
+    };
+    setElyonSections((prev) => [...prev, newSection]);
+    
+    // Scroll to the new section after a brief delay
+    setTimeout(() => {
+      const element = document.getElementById(newSection.id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
+  const handleDeleteElyonSection = (sectionId: string) => {
+    setElyonSections((prev) => prev.filter((s) => s.id !== sectionId));
+    toast({
+      title: 'Section deleted',
+      description: 'The Elyon analysis section has been removed.',
     });
   };
 
@@ -631,10 +666,35 @@ export default function ClaimReport() {
                   </div>
                 </ReportSection>
               )}
+
+              {/* Dynamic Elyon Analysis Sections */}
+              {elyonSections.map((section) => (
+                <ElyonAnalysisSection
+                  key={section.id}
+                  id={section.id}
+                  title={section.title}
+                  content={section.content}
+                  isEditing={isEditing}
+                  onDelete={() => handleDeleteElyonSection(section.id)}
+                  editableAttributes={editableAttributes}
+                  editableBlockClass={editableBlockClass}
+                />
+              ))}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Elyon Chat Interface */}
+      <ElyonChat
+        claim={claim}
+        timeline={timeline}
+        contradictions={contradictions}
+        missingFlags={missingFlags}
+        bills={bills}
+        reportTitle={reportTitle}
+        onInsertSection={handleInsertElyonSection}
+      />
 
       <AddDocumentsModal
         open={showAddDocs}
