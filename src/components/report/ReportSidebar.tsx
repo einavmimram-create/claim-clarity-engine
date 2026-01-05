@@ -31,7 +31,7 @@ export function ReportSidebar({ reportType, isFutureReport = false }: ReportSide
   ];
 
   const causationAnalysisSubsections: Subsection[] = [
-    { id: 'causation-analysis', title: 'Accident Mechanism' },
+    { id: 'causation-analysis', title: 'Mechanism of Injury' },
     { id: 'injury-separation', title: 'Medical Condition Classification' },
     { id: 'treatment-mapping', title: 'Treatment-to-Diagnosis Mapping' },
     { id: 'causation-confidence', title: 'Causation Summary' },
@@ -73,7 +73,7 @@ export function ReportSidebar({ reportType, isFutureReport = false }: ReportSide
       id: 'causation-analysis',
       title: 'Causation Analysis',
       subsections: isMVP
-        ? [causationAnalysisSubsections[0]] // Only Accident Mechanism for MVP
+        ? [causationAnalysisSubsections[0]] // Only Mechanism of Injury for MVP
         : causationAnalysisSubsections,
     },
     {

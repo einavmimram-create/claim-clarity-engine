@@ -292,7 +292,7 @@ export default function ClaimReport() {
                   title="Causation Analysis"
                 >
                   <div className="bg-report-section rounded-lg p-4">
-                    <h4 className="font-medium text-foreground mb-2">Accident Mechanism</h4>
+                    <h4 className="font-medium text-foreground mb-2">Mechanism of Injury</h4>
                     <p className={`text-foreground/90 ${editableBlockClass}`} {...editableAttributes}>
                       Slip on wet floor with axial loading directly onto sacrum.
                     </p>
@@ -305,7 +305,7 @@ export default function ClaimReport() {
                   title="Causation Analysis"
                 >
                   <div className="bg-report-section rounded-lg p-4 mb-4">
-                    <h4 className="font-medium text-foreground mb-2">Accident Mechanism</h4>
+                    <h4 className="font-medium text-foreground mb-2">Mechanism of Injury</h4>
                     <p className={`text-foreground/90 ${editableBlockClass}`} {...editableAttributes}>
                       Slip on wet floor with axial loading directly onto sacrum.
                     </p>
