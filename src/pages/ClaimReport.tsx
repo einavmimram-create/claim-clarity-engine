@@ -312,10 +312,7 @@ export default function ClaimReport() {
                   </div>
 
                   <div className="bg-report-section rounded-lg p-4">
-                    <h4 className="font-medium text-foreground mb-2">Injury Compatibility Assessment</h4>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-semibold text-success">Score: 92 / 100</span>
-                    </div>
+                    <h4 className="font-medium text-foreground mb-2">Compatibility Assessment</h4>
                     <p className={`text-foreground/90 ${editableBlockClass}`} {...editableAttributes}>
                       MRI-confirmed extrusion and neurological findings strongly support acute traumatic origin.
                     </p>
@@ -462,7 +459,7 @@ export default function ClaimReport() {
                           </td>
                           <td className="px-4 py-3 text-center">
                             <Badge variant="medium">
-                              <span className={editableInlineClass} {...editableAttributes}>Partial</span>
+                              <span className={editableInlineClass} {...editableAttributes}>75%</span>
                             </Badge>
                           </td>
                         </tr>
