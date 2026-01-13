@@ -1,5 +1,4 @@
 import { AlertTriangle } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Contradiction } from '@/types/claim';
 import { EvidenceLink } from './EvidenceLink';
 
@@ -12,7 +11,7 @@ export function ContradictionCard({ contradiction, isEditing = false }: Contradi
   const typeLabels = {
     diagnosis: 'Diagnosis Conflict',
     notes_vs_procedures: 'Notes vs Procedures',
-    narrative_vs_records: 'Narrative vs Records',
+    narrative_vs_records: 'Records Inconsistency',
   };
 
   const editableAttributes = isEditing
@@ -33,11 +32,6 @@ export function ContradictionCard({ contradiction, isEditing = false }: Contradi
             <span className={`font-medium text-foreground ${editableClass}`} {...editableAttributes}>
               {typeLabels[contradiction.type]}
             </span>
-            <Badge variant={contradiction.severity}>
-              <span className={editableClass} {...editableAttributes}>
-                {contradiction.severity.charAt(0).toUpperCase() + contradiction.severity.slice(1)} Severity
-              </span>
-            </Badge>
           </div>
           <p className={`text-foreground/90 mb-3 ${editableClass}`} {...editableAttributes}>
             {contradiction.description}

@@ -230,7 +230,7 @@ export default function ClaimReport() {
                     </p>
 
                     <p className={`mb-4 ${editableBlockClass}`} {...editableAttributes}>
-                      While the claimant had a prior history of a lumbosacral strain in 2003 and unrelated sinus surgery in 2004, the clinical evidence supports the 2005 fall as the primary cause of his structural spinal injury. The total reviewed billing is {formatCurrency(totalBilled)}, with {formatCurrency(accidentRelatedBilled)} deemed accident-related and {formatCurrency(unrelatedBilled)} identified as unrelated to the trauma.
+                      While the claimant had a prior history of a lumbosacral strain in 2003 and unrelated sinus surgery in 2004, the available clinical evidence shows strong support for the 2005 fall being the primary cause of his structural spinal injury. The total reviewed billing is {formatCurrency(totalBilled)}, with {formatCurrency(accidentRelatedBilled)} showing strong support for accident relation, while {formatCurrency(unrelatedBilled)} showing limited support for accident relation.
                     </p>
 
                     <div className="mt-4 flex gap-2">
@@ -349,7 +349,7 @@ export default function ClaimReport() {
                   <div className="bg-report-section rounded-lg p-4">
                     <h4 className="font-medium text-foreground mb-2">Compatibility Assessment</h4>
                     <p className={`text-foreground/90 ${editableBlockClass}`} {...editableAttributes}>
-                      MRI-confirmed extrusion and neurological findings strongly support acute traumatic origin.
+                      MRI-confirmed extrusion and neurological findings show strong support for an acute traumatic origin.
                     </p>
                   </div>
                 </ReportSection>
@@ -388,10 +388,10 @@ export default function ClaimReport() {
                     </table>
                   </div>
 
-                  {/* Accident-Related Medical Findings */}
+                  {/* Accident-Related Medical Conditions */}
                   <div className="border border-border rounded-lg overflow-hidden">
                     <div className="bg-secondary px-4 py-3 border-b border-border">
-                      <h3 className="text-sm font-medium text-muted-foreground">Accident-Related Medical Findings</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">Accident-Related Medical Conditions</h3>
                     </div>
                     <table className="w-full">
                       <tbody className="divide-y divide-border">
@@ -429,7 +429,8 @@ export default function ClaimReport() {
                         <tr>
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Treatment</th>
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Diagnosis</th>
-                          <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground">Support</th>
+                          <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground">Support Level</th>
+                          <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Record-Based Reasoning</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
@@ -442,8 +443,11 @@ export default function ClaimReport() {
                           </td>
                           <td className="px-4 py-3 text-center">
                             <Badge variant="low">
-                              <span className={editableInlineClass} {...editableAttributes}>100%</span>
+                              <span className={editableInlineClass} {...editableAttributes}>Strong Support</span>
                             </Badge>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>MRI (04/11/2005) documents an extruded L3–L4 disc with correlating radiculopathy following the reported fall.</span>
                           </td>
                         </tr>
                         <tr>
@@ -455,8 +459,11 @@ export default function ClaimReport() {
                           </td>
                           <td className="px-4 py-3 text-center">
                             <Badge variant="low">
-                              <span className={editableInlineClass} {...editableAttributes}>100%</span>
+                              <span className={editableInlineClass} {...editableAttributes}>Strong Support</span>
                             </Badge>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Surgical records describe removal of an extruded disc fragment consistent with MRI findings.</span>
                           </td>
                         </tr>
                         <tr>
@@ -468,8 +475,11 @@ export default function ClaimReport() {
                           </td>
                           <td className="px-4 py-3 text-center">
                             <Badge variant="high">
-                              <span className={editableInlineClass} {...editableAttributes}>0%</span>
+                              <span className={editableInlineClass} {...editableAttributes}>Limited Support</span>
                             </Badge>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>FESS sinus surgery occurred 11 months prior to the index accident and addresses a chronic sinus condition documented before the fall.</span>
                           </td>
                         </tr>
                         <tr>
@@ -481,8 +491,11 @@ export default function ClaimReport() {
                           </td>
                           <td className="px-4 py-3 text-center">
                             <Badge variant="low">
-                              <span className={editableInlineClass} {...editableAttributes}>100%</span>
+                              <span className={editableInlineClass} {...editableAttributes}>Strong Support</span>
                             </Badge>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Revision fusion followed documented recurrence and persistent neurological deficits post-discectomy.</span>
                           </td>
                         </tr>
                         <tr>
@@ -494,8 +507,11 @@ export default function ClaimReport() {
                           </td>
                           <td className="px-4 py-3 text-center">
                             <Badge variant="medium">
-                              <span className={editableInlineClass} {...editableAttributes}>75%</span>
+                              <span className={editableInlineClass} {...editableAttributes}>Moderate Support</span>
                             </Badge>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-foreground">
+                            <span className={editableInlineClass} {...editableAttributes}>Injection performed during diagnostic phase when hip pathology was considered prior to lumbar confirmation.</span>
                           </td>
                         </tr>
                       </tbody>
@@ -513,8 +529,8 @@ export default function ClaimReport() {
                 >
                   <ConfidenceIndicator
                     level="high"
-                    label="Strong Causation"
-                    description="The fall caused a structural disc extrusion. Subsequent surgeries stem directly from this injury rather than degeneration."
+                    label="Strong Support for Accident-Related Causation"
+                    description="Available records show strong support for a traumatic disc extrusion associated with the reported fall."
                     isEditing={isEditing}
                   />
                 </ReportSection>
@@ -533,13 +549,13 @@ export default function ClaimReport() {
                   className="grid md:grid-cols-3 gap-4 mb-6 scroll-mt-24"
                 >
                   <div className="bg-success/10 rounded-lg p-4">
-                    <p className={`text-sm text-success mb-1 ${editableInlineClass}`} {...editableAttributes}>Accident Related</p>
+                    <p className={`text-xs text-success mb-1 ${editableInlineClass}`} {...editableAttributes}>Strong Support for Accident Relation</p>
                     <p className={`text-2xl font-semibold text-success ${editableInlineClass}`} {...editableAttributes}>
                       {formatCurrency(accidentRelatedBilled)}
                     </p>
                   </div>
                   <div className="bg-destructive/10 rounded-lg p-4">
-                    <p className={`text-sm text-destructive mb-1 ${editableInlineClass}`} {...editableAttributes}>Unrelated</p>
+                    <p className={`text-xs text-destructive mb-1 ${editableInlineClass}`} {...editableAttributes}>Limited Support for Accident Relation</p>
                     <p className={`text-2xl font-semibold text-destructive ${editableInlineClass}`} {...editableAttributes}>
                       {formatCurrency(unrelatedBilled)}
                     </p>

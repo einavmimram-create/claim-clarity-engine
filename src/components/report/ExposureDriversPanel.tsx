@@ -39,8 +39,8 @@ const exposureDrivers: ExposureDriver[] = [
   {
     id: 'sinus',
     bodyPart: 'Sinuses',
-    driver: 'Pre-existing Sinusitis (Unrelated)',
-    whyItMatters: 'Prior FESS surgery is clearly unrelated to trauma. Billing inclusion inflates claim but is easily defensible.',
+    driver: 'Pre-existing Sinusitis',
+    whyItMatters: 'Prior FESS surgery is possibly unrelated to trauma. Billing inclusion inflates claim but can be defensible.',
     evidenceSource: 'ENT Records',
     evidencePageRef: 'ENT-001',
     riskScore: 'low',
@@ -68,6 +68,12 @@ const riskBadgeVariants = {
   low: 'low' as const,
   medium: 'medium' as const,
   high: 'high' as const,
+};
+
+const riskSupportText = {
+  low: 'Limited record support for accident relation',
+  medium: 'Moderate record support for accident relation',
+  high: 'Strong record support for accident relation',
 };
 
 interface ExposureDriversPanelProps {
@@ -152,7 +158,7 @@ export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground text-sm">{driver.bodyPart}</h3>
                         <Badge variant={riskBadgeVariants[driver.riskScore]} className="mt-1 text-xs">
-                          {driver.riskScore.charAt(0).toUpperCase() + driver.riskScore.slice(1)} Risk
+                          {riskSupportText[driver.riskScore]}
                         </Badge>
                       </div>
                       {isSelected && (
@@ -196,15 +202,15 @@ export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
       <div className="mt-4 flex justify-center gap-4 text-xs">
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-success" />
-          <span className="text-muted-foreground">Defensible</span>
+          <span className="text-muted-foreground">Limited Support</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-warning" />
-          <span className="text-muted-foreground">May escalate</span>
+          <span className="text-muted-foreground">Moderate Support</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-destructive" />
-          <span className="text-muted-foreground">Primary driver</span>
+          <span className="text-muted-foreground">Strong Support</span>
         </div>
       </div>
     </div>

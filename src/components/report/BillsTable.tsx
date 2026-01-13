@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { BillItem } from '@/types/claim';
-import { AlertTriangle, CheckCircle, Copy } from 'lucide-react';
+import { Copy } from 'lucide-react';
 
 interface BillsTableProps {
   bills: BillItem[];
@@ -27,6 +27,12 @@ export function BillsTable({ bills, showRiskOnly = false, isEditing = false }: B
     ? 'border border-dashed border-border rounded hover:border-primary cursor-text'
     : '';
 
+  const supportLevelText = {
+    low: 'Strong Support',
+    medium: 'Moderate Support',
+    high: 'Limited Support',
+  };
+
   return (
     <div className="border border-border rounded-lg overflow-hidden">
       <table className="w-full">
@@ -36,8 +42,7 @@ export function BillsTable({ bills, showRiskOnly = false, isEditing = false }: B
             <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Provider</th>
             <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Description</th>
             <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Amount</th>
-            <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground">Status</th>
-            <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground">Risk</th>
+            <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground">Support Level</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -72,22 +77,9 @@ export function BillsTable({ bills, showRiskOnly = false, isEditing = false }: B
                 <span className={editableClass} {...editableAttributes}>{formatCurrency(bill.amount)}</span>
               </td>
               <td className="px-4 py-3 text-center">
-                {bill.isAccidentRelated ? (
-                  <span className="inline-flex items-center gap-1 text-xs text-success">
-                    <CheckCircle className="w-3.5 h-3.5" />
-                    Accident-related
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                    <AlertTriangle className="w-3.5 h-3.5" />
-                    Unrelated
-                  </span>
-                )}
-              </td>
-              <td className="px-4 py-3 text-center">
                 <Badge variant={bill.riskScore}>
                   <span className={editableClass} {...editableAttributes}>
-                    {bill.riskScore.charAt(0).toUpperCase() + bill.riskScore.slice(1)}
+                    {supportLevelText[bill.riskScore]}
                   </span>
                 </Badge>
               </td>
