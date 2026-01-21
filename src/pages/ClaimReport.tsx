@@ -69,13 +69,13 @@ export default function ClaimReport() {
     : '';
 
   const accidentRelatedBilled = isMVP 
-    ? 33323.72 
+    ? 35622.60 
     : bills.filter(b => b.isAccidentRelated).reduce((sum, b) => sum + b.amount, 0);
   const unrelatedBilled = isMVP 
-    ? 8178.05 
+    ? 10890.93 
     : bills.filter(b => !b.isAccidentRelated).reduce((sum, b) => sum + b.amount, 0);
   const totalBilled = isMVP 
-    ? 41501.77 
+    ? 46513.53 
     : accidentRelatedBilled + unrelatedBilled;
 
   const formatCurrency = (amount: number) => {
@@ -628,7 +628,7 @@ export default function ClaimReport() {
                           <span className={`font-medium text-foreground ${editableInlineClass}`} {...editableAttributes}>Inova Fairfax</span>
                           <Badge variant="high">Unrelated</Badge>
                         </div>
-                        <span className={`font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>$8,178.05</span>
+                        <span className={`font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>$10,890.93</span>
                       </div>
                     </div>
                   </div>

@@ -27,10 +27,10 @@ const baseMissingFlags: MissingFlag[] = [
 const baseBills: BillItem[] = [
   { id: '1', date: '2005-04-26', provider: 'Virginia Neurosurgeons, PC', description: 'L3–L4 Decompression / Discectomy – Surgeon (Professional Fees)', amount: 10557.00, category: 'Surgery', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const, documentLink: '/Virginia Neurosurgeons Statement.html' },
   { id: '2', date: '2006-06-29', provider: 'Virginia Hospital Center', description: '360° Revision Fusion', amount: 15863.84, category: 'Surgery', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
-  { id: '3', date: '2004-02-04', provider: 'Inova Fairfax', description: 'FESS Sinus Surgery', amount: 8178.05, category: 'Surgery', isAccidentRelated: false, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'high' as const },
+  { id: '3', date: '2004-02-04', provider: 'Inova Fairfax', description: 'FESS Sinus Surgery', amount: 10890.93, category: 'Surgery', isAccidentRelated: false, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'high' as const },
   { id: '4', date: '2005-04-11', provider: 'Radiology Associates', description: 'MRI Lumbar Spine', amount: 2400, category: 'Imaging', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
   { id: '5', date: '2005-04-11', provider: 'Radiology Associates', description: 'MRI Lumbar Spine', amount: 2400, category: 'Imaging', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: true, riskScore: 'high' as const },
-  { id: '6', date: '2005-02-16', provider: 'Orthopedic Associates', description: 'Initial Evaluation - Misc coded', amount: 345, category: 'Office Visit', isAccidentRelated: true, hasMatchingTreatment: false, isDuplicate: false, riskScore: 'medium' as const },
+  { id: '6', date: '2005-02-16', provider: 'Orthopedic Associates', description: 'Initial Evaluation - mis-coded', amount: 345, category: 'Office Visit', isAccidentRelated: true, hasMatchingTreatment: false, isDuplicate: false, riskScore: 'medium' as const },
   { id: '7', date: '2005-03-15', provider: 'CVS Pharmacy', description: 'Pain Medication', amount: 312.88, category: 'Pharmacy', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
   { id: '8', date: '2005-03-15', provider: 'CVS Pharmacy', description: 'Pain Medication', amount: 312.88, category: 'Pharmacy', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: true, riskScore: 'high' as const },
   { id: '9', date: '2006-01-16', provider: 'Imaging Center', description: 'Post-op MRI', amount: 1132.12, category: 'Imaging', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
@@ -77,23 +77,21 @@ function deepCloneArray<T>(arr: T[]): T[] {
 
 /**
  * Gets MVP-specific bills that match the required totals
- * Accident Related: $33,323.72
- * Unrelated: $8,178.05
- * Total: $41,501.77
+ * Accident Related: $35,622.60
+ * Unrelated: $10,890.93
+ * Total: $46,513.53
  */
 function getMVPBills(): BillItem[] {
   return [
     { id: '1', date: '2005-04-26', provider: 'Virginia Neurosurgeons, PC', description: 'L3–L4 Decompression / Discectomy – Surgeon (Professional Fees)', amount: 10557.00, category: 'Surgery', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const, documentLink: '/Virginia Neurosurgeons Statement.html' },
     { id: '2', date: '2006-06-29', provider: 'Virginia Hospital Center', description: '360° Revision Fusion', amount: 15863.84, category: 'Surgery', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
-    { id: '3', date: '2004-02-04', provider: 'Inova Fairfax', description: 'FESS Sinus Surgery', amount: 8178.05, category: 'Surgery', isAccidentRelated: false, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'high' as const },
+    { id: '3', date: '2004-02-04', provider: 'Inova Fairfax', description: 'FESS Sinus Surgery', amount: 10890.93, category: 'Surgery', isAccidentRelated: false, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'high' as const },
     { id: '4', date: '2005-04-11', provider: 'Radiology Associates', description: 'MRI Lumbar Spine', amount: 2400, category: 'Imaging', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
     { id: '5', date: '2005-04-11', provider: 'Radiology Associates', description: 'MRI Lumbar Spine', amount: 2400, category: 'Imaging', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: true, riskScore: 'high' as const },
-    { id: '6', date: '2005-02-16', provider: 'Orthopedic Associates', description: 'Initial Evaluation - Misc coded', amount: 345, category: 'Office Visit', isAccidentRelated: true, hasMatchingTreatment: false, isDuplicate: false, riskScore: 'medium' as const },
+    { id: '6', date: '2005-02-16', provider: 'Orthopedic Associates', description: 'Initial Evaluation - mis-coded', amount: 345, category: 'Office Visit', isAccidentRelated: true, hasMatchingTreatment: false, isDuplicate: false, riskScore: 'medium' as const },
     { id: '7', date: '2005-03-15', provider: 'CVS Pharmacy', description: 'Pain Medication', amount: 312.88, category: 'Pharmacy', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
     { id: '8', date: '2005-03-15', provider: 'CVS Pharmacy', description: 'Pain Medication', amount: 312.88, category: 'Pharmacy', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: true, riskScore: 'high' as const },
     { id: '9', date: '2006-01-16', provider: 'Imaging Center', description: 'Post-op MRI', amount: 1132.12, category: 'Imaging', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
-    // Additional bill to reach $33,323.72 accident-related total
-    { id: '10', date: '2005-05-10', provider: 'Physical Therapy Center', description: 'PT Sessions (12 visits)', amount: 2298.88, category: 'Physical Therapy', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const },
   ];
 }
 

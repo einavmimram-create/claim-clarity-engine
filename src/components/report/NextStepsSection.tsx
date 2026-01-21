@@ -35,7 +35,7 @@ const initialActionItems: ActionItem[] = [
   },
   {
     id: '3',
-    action: 'Challenge $8,178.05 sinus surgery billing inclusion',
+    action: 'Challenge $10,890.93 sinus surgery billing inclusion',
     completed: false,
   },
   {

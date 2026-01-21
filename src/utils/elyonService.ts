@@ -243,7 +243,7 @@ function generateMockAnswer(query: string, context: string): string {
   }
 
   if (lowerQuery.includes('billing') || lowerQuery.includes('cost') || lowerQuery.includes('total')) {
-    return `The total reviewed billing is $41,501.77, with $33,323.72 (80.3%) deemed accident-related and $8,178.05 (19.7%) identified as unrelated. The unrelated charges primarily stem from the sinus surgery in 2004, which occurred before the accident date. High-value bills include Washington Hospital Center ($19,028) and Virginia Hospital Center ($15,863.84) for the surgical procedures.`;
+    return `The total reviewed billing is $46,513.53, with $35,622.60 (76.6%) deemed accident-related and $10,890.93 (23.4%) identified as unrelated. The unrelated charges primarily stem from the sinus surgery in 2004, which occurred before the accident date. High-value bills include Washington Hospital Center ($19,028) and Virginia Hospital Center ($15,863.84) for the surgical procedures.`;
   }
 
   if (lowerQuery.includes('causation') || lowerQuery.includes('cause')) {
@@ -263,6 +263,6 @@ function generateMockAnswer(query: string, context: string): string {
   }
 
   // Default response
-  return `Based on the report data, I can see this claim involves a slip-and-fall accident on January 23, 2005, resulting in an L3-L4 disc herniation. The claimant underwent two spinal surgeries over 14 months, with total billing of $41,501.77. The clinical timeline shows a clear progression from injury to surgical intervention, with appropriate diagnostic steps. What specific aspect would you like me to analyze further?`;
+  return `Based on the report data, I can see this claim involves a slip-and-fall accident on January 23, 2005, resulting in an L3-L4 disc herniation. The claimant underwent two spinal surgeries over 14 months, with total billing of $46,513.53. The clinical timeline shows a clear progression from injury to surgical intervention, with appropriate diagnostic steps. What specific aspect would you like me to analyze further?`;
 }
 
