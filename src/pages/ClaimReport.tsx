@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, HTMLAttributes } from 'react';
+import { useState, useRef, useEffect, useMemo, HTMLAttributes } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Edit3, Plus, Save, X } from 'lucide-react';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -20,6 +20,14 @@ import { ElyonAnalysisSection } from '@/components/report/ElyonAnalysisSection';
 import { AddDocumentsModal } from '@/components/claims/AddDocumentsModal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
 import { mockClaims } from '@/data/mockClaims';
 import { getClaimReportData, getReportTitle, getReportType } from '@/utils/reportData';
@@ -53,6 +61,25 @@ export default function ClaimReport() {
   const reportType = getReportType(claim);
   const isMVP = reportType === 'mvp';
   const isFutureReport = claim.id === '3' || reportTitle.includes('Future Report');
+  const patientName = reportTitle.includes(':')
+    ? reportTitle.split(': ').slice(1).join(': ')
+    : reportTitle;
+  const [showTimelineFilters, setShowTimelineFilters] = useState(true);
+
+  const [timelineFilters, setTimelineFilters] = useState({
+    patientName: '',
+    doctorName: '',
+    medicalSpecialty: '',
+    medicalFacility: '',
+    procedureType: '',
+    medicationType: '',
+    label: '',
+    needsReview: '',
+    isKeyDate: '',
+    startDate: '',
+    endDate: '',
+    search: '',
+  });
 
   const editableAttributes: Pick<HTMLAttributes<HTMLElement>, 'contentEditable' | 'suppressContentEditableWarning'> =
     isEditing
@@ -85,6 +112,122 @@ export default function ClaimReport() {
       minimumFractionDigits: 2,
     }).format(amount);
   };
+
+  const timelineFilterOptions = useMemo(() => {
+    const normalizeValues = (values: string[]) =>
+      Array.from(new Set(values.filter(Boolean))).sort((a, b) => a.localeCompare(b));
+
+    const doctorNames = timeline
+      .map((event) => event.doctorName || (event.provider.startsWith('Dr.') ? event.provider : ''))
+      .filter(Boolean);
+    const facilities = timeline
+      .map((event) => event.medicalFacility || (!event.provider.startsWith('Dr.') ? event.provider : ''))
+      .filter(Boolean);
+    const specialties = timeline.flatMap((event) =>
+      event.medicalSpecialties?.length ? event.medicalSpecialties : event.specialty ? [event.specialty] : [],
+    );
+    const procedureTypes = timeline.flatMap((event) =>
+      event.procedureTypes?.length ? event.procedureTypes : event.eventType ? [event.eventType] : [],
+    );
+    const medicationTypes = timeline
+      .map((event) => event.medicationType || '')
+      .filter(Boolean);
+    const labels = timeline.flatMap((event) => event.labels || event.patientComplaints || []);
+
+    return {
+      patientNames: normalizeValues([patientName]),
+      doctorNames: normalizeValues(doctorNames),
+      medicalFacilities: normalizeValues(facilities),
+      medicalSpecialties: normalizeValues(specialties),
+      procedureTypes: normalizeValues(procedureTypes),
+      medicationTypes: normalizeValues(medicationTypes),
+      labels: normalizeValues(labels),
+    };
+  }, [timeline, patientName]);
+
+  const filteredTimeline = useMemo(() => {
+    const searchValue = timelineFilters.search.trim().toLowerCase();
+    const startDate = timelineFilters.startDate ? new Date(timelineFilters.startDate) : null;
+    const endDate = timelineFilters.endDate ? new Date(timelineFilters.endDate) : null;
+
+    return timeline.filter((event) => {
+      const eventPatientName = event.patientName || patientName;
+      const doctorName = event.doctorName || (event.provider.startsWith('Dr.') ? event.provider : '');
+      const facility = event.medicalFacility || (!event.provider.startsWith('Dr.') ? event.provider : '');
+      const specialties = event.medicalSpecialties?.length
+        ? event.medicalSpecialties
+        : event.specialty
+          ? [event.specialty]
+          : [];
+      const procedureTypes = event.procedureTypes?.length
+        ? event.procedureTypes
+        : event.eventType
+          ? [event.eventType]
+          : [];
+      const medicationTypes = event.medicationType ? [event.medicationType] : [];
+      const labels = event.labels || event.patientComplaints || [];
+      const isKeyDate = event.isKeyDate || false;
+      const needsReview = event.needsReview || false;
+      const eventDate = new Date(event.date);
+
+      if (timelineFilters.patientName && eventPatientName !== timelineFilters.patientName) {
+        return false;
+      }
+      if (timelineFilters.doctorName && doctorName !== timelineFilters.doctorName) {
+        return false;
+      }
+      if (timelineFilters.medicalSpecialty && !specialties.includes(timelineFilters.medicalSpecialty)) {
+        return false;
+      }
+      if (timelineFilters.medicalFacility && facility !== timelineFilters.medicalFacility) {
+        return false;
+      }
+      if (timelineFilters.procedureType && !procedureTypes.includes(timelineFilters.procedureType)) {
+        return false;
+      }
+      if (timelineFilters.medicationType && !medicationTypes.includes(timelineFilters.medicationType)) {
+        return false;
+      }
+      if (timelineFilters.label && !labels.includes(timelineFilters.label)) {
+        return false;
+      }
+      if (timelineFilters.needsReview === 'yes' && !needsReview) {
+        return false;
+      }
+      if (timelineFilters.needsReview === 'no' && needsReview) {
+        return false;
+      }
+      if (timelineFilters.isKeyDate === 'yes' && !isKeyDate) {
+        return false;
+      }
+      if (timelineFilters.isKeyDate === 'no' && isKeyDate) {
+        return false;
+      }
+      if (startDate && !isNaN(eventDate.getTime()) && eventDate < startDate) {
+        return false;
+      }
+      if (endDate && !isNaN(eventDate.getTime()) && eventDate > endDate) {
+        return false;
+      }
+      if (searchValue) {
+        const haystack = [
+          event.date,
+          event.provider,
+          event.specialty,
+          event.eventType,
+          event.description,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+        if (!haystack.includes(searchValue)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [timeline, timelineFilters, patientName]);
 
   useEffect(() => {
     if (id && claim.id) {
@@ -136,6 +279,28 @@ export default function ClaimReport() {
       title: 'Section deleted',
       description: 'The Elyon analysis section has been removed.',
     });
+  };
+
+  const handleToggleKeyEvent = (eventId: string) => {
+    setTimeline((prev) =>
+      prev.map((event) =>
+        event.id === eventId ? { ...event, isKeyDate: !event.isKeyDate } : event,
+      ),
+    );
+  };
+
+  const handleToggleNeedsReview = (eventId: string) => {
+    setTimeline((prev) =>
+      prev.map((event) =>
+        event.id === eventId ? { ...event, needsReview: !event.needsReview } : event,
+      ),
+    );
+  };
+
+  const handleEditTimelineEvent = () => {
+    if (!isEditing) {
+      setIsEditing(true);
+    }
   };
 
   return (
@@ -272,16 +437,301 @@ export default function ClaimReport() {
                 id="medical-timeline"
                 title="Medical Timeline (Clinical Milestones)"
               >
-                <div className="mt-4">
-                  {timeline.map((event, index) => (
-                    <TimelineEvent
-                      key={event.id}
-                      event={event}
-                      isFirst={index === 0}
-                      isLast={index === timeline.length - 1}
-                      isEditing={isEditing}
-                    />
-                  ))}
+                <div className="mt-4 space-y-4">
+                  <div className="bg-card border border-border rounded-lg">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                      <h4 className="text-sm font-medium text-foreground">Filters</h4>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowTimelineFilters((prev) => !prev)}
+                      >
+                        {showTimelineFilters ? 'Hide' : 'Show'}
+                      </Button>
+                    </div>
+                    {showTimelineFilters && (
+                      <div className="p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Patient Name</p>
+                            <Select
+                              value={timelineFilters.patientName || 'all'}
+                              onValueChange={(value) =>
+                                setTimelineFilters((prev) => ({
+                                  ...prev,
+                                  patientName: value === 'all' ? '' : value,
+                                }))
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                {timelineFilterOptions.patientNames.map((name) => (
+                                  <SelectItem key={name} value={name}>
+                                    {name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Doctor Name</p>
+                            <Select
+                              value={timelineFilters.doctorName || 'all'}
+                              onValueChange={(value) =>
+                                setTimelineFilters((prev) => ({
+                                  ...prev,
+                                  doctorName: value === 'all' ? '' : value,
+                                }))
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                {timelineFilterOptions.doctorNames.map((name) => (
+                                  <SelectItem key={name} value={name}>
+                                    {name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Medical Specialty</p>
+                            <Select
+                              value={timelineFilters.medicalSpecialty || 'all'}
+                              onValueChange={(value) =>
+                                setTimelineFilters((prev) => ({
+                                  ...prev,
+                                  medicalSpecialty: value === 'all' ? '' : value,
+                                }))
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                {timelineFilterOptions.medicalSpecialties.map((specialty) => (
+                                  <SelectItem key={specialty} value={specialty}>
+                                    {specialty}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Medical Facility</p>
+                            <Select
+                              value={timelineFilters.medicalFacility || 'all'}
+                              onValueChange={(value) =>
+                                setTimelineFilters((prev) => ({
+                                  ...prev,
+                                  medicalFacility: value === 'all' ? '' : value,
+                                }))
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                {timelineFilterOptions.medicalFacilities.map((facility) => (
+                                  <SelectItem key={facility} value={facility}>
+                                    {facility}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Procedure Type</p>
+                            <Select
+                              value={timelineFilters.procedureType || 'all'}
+                              onValueChange={(value) =>
+                                setTimelineFilters((prev) => ({
+                                  ...prev,
+                                  procedureType: value === 'all' ? '' : value,
+                                }))
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                {timelineFilterOptions.procedureTypes.map((procedure) => (
+                                  <SelectItem key={procedure} value={procedure}>
+                                    {procedure}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Medication Type</p>
+                            <Select
+                              value={timelineFilters.medicationType || 'all'}
+                              onValueChange={(value) =>
+                                setTimelineFilters((prev) => ({
+                                  ...prev,
+                                  medicationType: value === 'all' ? '' : value,
+                                }))
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                {timelineFilterOptions.medicationTypes.map((medication) => (
+                                  <SelectItem key={medication} value={medication}>
+                                    {medication}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Labels</p>
+                            <Select
+                              value={timelineFilters.label || 'all'}
+                              onValueChange={(value) =>
+                                setTimelineFilters((prev) => ({
+                                  ...prev,
+                                  label: value === 'all' ? '' : value,
+                                }))
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                {timelineFilterOptions.labels.map((label) => (
+                                  <SelectItem key={label} value={label}>
+                                    {label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Start Date</p>
+                            <Input
+                              type="date"
+                              value={timelineFilters.startDate}
+                              onChange={(event) =>
+                                setTimelineFilters((prev) => ({
+                                  ...prev,
+                                  startDate: event.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">End Date</p>
+                            <Input
+                              type="date"
+                              value={timelineFilters.endDate}
+                              onChange={(event) =>
+                                setTimelineFilters((prev) => ({
+                                  ...prev,
+                                  endDate: event.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Needs Review</p>
+                            <Select
+                              value={timelineFilters.needsReview || 'all'}
+                              onValueChange={(value) =>
+                                setTimelineFilters((prev) => ({
+                                  ...prev,
+                                  needsReview: value === 'all' ? '' : value,
+                                }))
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                <SelectItem value="yes">Needs Review</SelectItem>
+                                <SelectItem value="no">No Review Flag</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Is Key Date</p>
+                            <Select
+                              value={timelineFilters.isKeyDate || 'all'}
+                              onValueChange={(value) =>
+                                setTimelineFilters((prev) => ({
+                                  ...prev,
+                                  isKeyDate: value === 'all' ? '' : value,
+                                }))
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                <SelectItem value="yes">Key Date</SelectItem>
+                                <SelectItem value="no">Not Key Date</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Search</p>
+                            <Input
+                              placeholder="Search"
+                              value={timelineFilters.search}
+                              onChange={(event) =>
+                                setTimelineFilters((prev) => ({
+                                  ...prev,
+                                  search: event.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-4">
+                    {filteredTimeline.map((event, index) => (
+                      <TimelineEvent
+                        key={event.id}
+                        event={event}
+                        patientName={patientName}
+                        onToggleKeyEvent={handleToggleKeyEvent}
+                        onToggleNeedsReview={handleToggleNeedsReview}
+                        onEditRequested={handleEditTimelineEvent}
+                        isFirst={index === 0}
+                        isLast={index === filteredTimeline.length - 1}
+                        isEditing={isEditing}
+                      />
+                    ))}
+                  </div>
                 </div>
               </ReportSection>
 

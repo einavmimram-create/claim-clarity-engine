@@ -19,6 +19,11 @@ export interface MedicalEvent {
   sourceDocument: string;
   sourcePageRef: string;
   // Optional detailed fields for expanded view
+  patientName?: string;
+  doctorName?: string;
+  medicalFacility?: string;
+  medicationType?: string;
+  labels?: string[];
   narrativeSummary?: string;
   patientComplaints?: string[];
   medicalSpecialties?: string[];
