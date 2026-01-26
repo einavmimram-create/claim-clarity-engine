@@ -1067,7 +1067,7 @@ export default function ClaimReport() {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
                         <span className={`font-medium text-foreground ${editableInlineClass}`} {...editableAttributes}>Washington Hospital Center</span>
-                        <span className={`font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>$19,028</span>
+                        <span className={`font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>$19,028.00</span>
                       </div>
                       <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
                         <span className={`font-medium text-foreground ${editableInlineClass}`} {...editableAttributes}>Virginia Hospital Center</span>

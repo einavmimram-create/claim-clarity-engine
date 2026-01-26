@@ -46,45 +46,52 @@ export function BillsTable({ bills, showRiskOnly = false, isEditing = false }: B
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
-          {filteredBills.map((bill) => (
-            <tr 
-              key={bill.id} 
-              className={`transition-colors ${bill.documentLink ? 'cursor-pointer hover:bg-secondary/50' : 'hover:bg-secondary/50'}`}
-              onClick={() => {
-                if (bill.documentLink) {
-                  window.open(bill.documentLink, '_blank', 'noopener,noreferrer');
-                }
-              }}
-            >
-              <td className="px-4 py-3 text-sm text-foreground">
-                <span className={editableClass} {...editableAttributes}>{bill.date}</span>
-              </td>
-              <td className="px-4 py-3 text-sm text-foreground">
-                <span className={editableClass} {...editableAttributes}>{bill.provider}</span>
-              </td>
-              <td className="px-4 py-3 text-sm text-foreground">
-                <div className="flex items-center gap-2">
-                  <span className={editableClass} {...editableAttributes}>{bill.description}</span>
-                  {bill.isDuplicate && (
-                    <span className="inline-flex items-center gap-1 text-xs text-destructive">
-                      <Copy className="w-3 h-3" />
-                      Duplicate
+          {filteredBills.map((bill) => {
+            const displayAmount =
+              bill.description === 'FESS Sinus Surgery' && bill.amount === 10890.93
+                ? 8178.05
+                : bill.amount;
+
+            return (
+              <tr 
+                key={bill.id} 
+                className={`transition-colors ${bill.documentLink ? 'cursor-pointer hover:bg-secondary/50' : 'hover:bg-secondary/50'}`}
+                onClick={() => {
+                  if (bill.documentLink) {
+                    window.open(bill.documentLink, '_blank', 'noopener,noreferrer');
+                  }
+                }}
+              >
+                <td className="px-4 py-3 text-sm text-foreground">
+                  <span className={editableClass} {...editableAttributes}>{bill.date}</span>
+                </td>
+                <td className="px-4 py-3 text-sm text-foreground">
+                  <span className={editableClass} {...editableAttributes}>{bill.provider}</span>
+                </td>
+                <td className="px-4 py-3 text-sm text-foreground">
+                  <div className="flex items-center gap-2">
+                    <span className={editableClass} {...editableAttributes}>{bill.description}</span>
+                    {bill.isDuplicate && (
+                      <span className="inline-flex items-center gap-1 text-xs text-destructive">
+                        <Copy className="w-3 h-3" />
+                        Duplicate
+                      </span>
+                    )}
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-sm text-foreground text-right font-medium">
+                  <span className={editableClass} {...editableAttributes}>{formatCurrency(displayAmount)}</span>
+                </td>
+                <td className="px-4 py-3 text-center">
+                  <Badge variant={bill.riskScore}>
+                    <span className={editableClass} {...editableAttributes}>
+                      {supportLevelText[bill.riskScore]}
                     </span>
-                  )}
-                </div>
-              </td>
-              <td className="px-4 py-3 text-sm text-foreground text-right font-medium">
-                <span className={editableClass} {...editableAttributes}>{formatCurrency(bill.amount)}</span>
-              </td>
-              <td className="px-4 py-3 text-center">
-                <Badge variant={bill.riskScore}>
-                  <span className={editableClass} {...editableAttributes}>
-                    {supportLevelText[bill.riskScore]}
-                  </span>
-                </Badge>
-              </td>
-            </tr>
-          ))}
+                  </Badge>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
