@@ -35,6 +35,16 @@ export function BillsTable({ bills, showRiskOnly = false, isEditing = false }: B
     high: 'Limited Support',
   };
 
+  const billingTypeText = (bill: BillItem) => {
+    const normalized = bill.treatmentType?.toLowerCase();
+    if (normalized === 'diagnostic') return 'Diagnostic';
+    if (normalized === 'curative') return 'Curative';
+    const category = bill.category.toLowerCase();
+    if (category.includes('imaging') || category.includes('office')) return 'Diagnostic';
+    if (category.includes('surgery') || category.includes('pharmacy')) return 'Curative';
+    return 'Diagnostic';
+  };
+
   const toggleRow = (billId: string) => {
     setExpandedRows((prev) => ({ ...prev, [billId]: !prev[billId] }));
   };
@@ -75,8 +85,16 @@ export function BillsTable({ bills, showRiskOnly = false, isEditing = false }: B
                     <span className={editableClass} {...editableAttributes}>{bill.provider}</span>
                   </td>
                   <td className="px-4 py-3 text-sm text-foreground">
+                  <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
-                      <span className={editableClass} {...editableAttributes}>{bill.description}</span>
+                      <span className={editableClass} {...editableAttributes}>
+                        {bill.description.replace(' - mis-coded', '')}
+                      </span>
+                      {bill.description.includes('mis-coded') && (
+                        <span className="inline-flex items-center gap-1 text-xs text-orange-500">
+                          mis-coded
+                        </span>
+                      )}
                       {bill.isDuplicate && (
                         <span className="inline-flex items-center gap-1 text-xs text-destructive">
                           <Copy className="w-3 h-3" />
@@ -84,6 +102,18 @@ export function BillsTable({ bills, showRiskOnly = false, isEditing = false }: B
                         </span>
                       )}
                     </div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs font-medium ${
+                          billingTypeText(bill) === 'Diagnostic'
+                            ? 'text-violet-600'
+                            : 'text-teal-600'
+                        }`}
+                      >
+                        {billingTypeText(bill)}
+                      </span>
+                    </div>
+                  </div>
                   </td>
                   <td className="px-4 py-3 text-sm text-foreground text-right font-medium">
                     <span className={editableClass} {...editableAttributes}>{formatCurrency(displayAmount)}</span>

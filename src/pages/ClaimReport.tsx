@@ -105,6 +105,18 @@ export default function ClaimReport() {
     ? 46513.53 
     : accidentRelatedBilled + unrelatedBilled;
 
+  const accidentRelatedTotals = useMemo(() => {
+    const diagnosticTotal = bills
+      .filter((bill) => bill.isAccidentRelated)
+      .filter((bill) => (bill.treatmentType || '').toLowerCase() === 'diagnostic')
+      .reduce((sum, bill) => sum + bill.amount, 0);
+    const curativeTotal = bills
+      .filter((bill) => bill.isAccidentRelated)
+      .filter((bill) => (bill.treatmentType || '').toLowerCase() === 'curative')
+      .reduce((sum, bill) => sum + bill.amount, 0);
+    return { diagnosticTotal, curativeTotal };
+  }, [bills]);
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -1004,25 +1016,34 @@ export default function ClaimReport() {
                 <div
                   id="billing-overview"
                   ref={(el) => (sectionRefs.current['billing-overview'] = el)}
-                  className="grid md:grid-cols-3 gap-4 mb-6 scroll-mt-24"
+                  className="grid grid-cols-3 gap-4 items-stretch mb-6 scroll-mt-24"
                 >
-                  <div className="bg-success/10 rounded-lg p-4">
-                    <p className={`text-xs text-success mb-1 ${editableInlineClass}`} {...editableAttributes}>Strong Support for Accident Relation</p>
-                    <p className={`text-2xl font-semibold text-success ${editableInlineClass}`} {...editableAttributes}>
+                  <div className="bg-success/10 rounded-lg p-4 h-full flex flex-col justify-center text-center">
+                    <div className="h-4" />
+                    <p className={`text-xs text-success leading-none ${editableInlineClass}`} {...editableAttributes}>Strong Support for Accident Relation</p>
+                    <p className={`text-2xl font-semibold text-success leading-none ${editableInlineClass}`} {...editableAttributes}>
                       {formatCurrency(accidentRelatedBilled)}
                     </p>
+                    <div className="mt-1 text-[11px] text-foreground leading-tight">
+                      <span className="font-semibold">Diagnostic:</span> {formatCurrency(accidentRelatedTotals.diagnosticTotal)}{' '}
+                      <span className="font-semibold">Curative:</span> {formatCurrency(accidentRelatedTotals.curativeTotal)}
+                    </div>
                   </div>
-                  <div className="bg-destructive/10 rounded-lg p-4">
-                    <p className={`text-xs text-destructive mb-1 ${editableInlineClass}`} {...editableAttributes}>Limited Support for Accident Relation</p>
-                    <p className={`text-2xl font-semibold text-destructive ${editableInlineClass}`} {...editableAttributes}>
+                  <div className="bg-destructive/10 rounded-lg p-4 h-full flex flex-col justify-center text-center">
+                    <div className="h-4" />
+                    <p className={`text-xs text-destructive leading-none ${editableInlineClass}`} {...editableAttributes}>Limited Support for Accident Relation</p>
+                    <p className={`text-2xl font-semibold text-destructive leading-none ${editableInlineClass}`} {...editableAttributes}>
                       {formatCurrency(unrelatedBilled)}
                     </p>
+                    <div className="mt-1 h-4" />
                   </div>
-                  <div className="bg-secondary rounded-lg p-4">
-                    <p className={`text-sm text-muted-foreground mb-1 ${editableInlineClass}`} {...editableAttributes}>Total</p>
-                    <p className={`text-2xl font-semibold text-foreground ${editableInlineClass}`} {...editableAttributes}>
+                  <div className="bg-secondary rounded-lg p-4 h-full flex flex-col justify-center text-center">
+                    <div className="h-4" />
+                    <p className={`text-sm text-muted-foreground leading-none ${editableInlineClass}`} {...editableAttributes}>Total</p>
+                    <p className={`text-2xl font-semibold text-foreground leading-none ${editableInlineClass}`} {...editableAttributes}>
                       {formatCurrency(totalBilled)}
                     </p>
+                    <div className="mt-1 h-4" />
                   </div>
                 </div>
 
