@@ -103,7 +103,7 @@ export function AddDocumentsModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add Documents to Case</DialogTitle>
+          <DialogTitle>Add Documents to Claim</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">

@@ -324,15 +324,17 @@ export default function ClaimReport() {
                     {reportTitle}
                   </h1>
                   <Badge variant="ready">Ready</Badge>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <span>{documentCount} documents analyzed</span>
-                    <button
-                      onClick={() => setShowAddDocs(true)}
-                      className="p-1 hover:bg-secondary rounded transition-colors"
-                      title="Add documents"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>{documentCount} documents analyzed</span>
+                  <button
+                      onClick={() => setShowAddDocs((prev) => !prev)}
+                      className={`p-1 rounded transition-colors cursor-pointer hover:bg-secondary/80 hover:text-foreground ${showAddDocs ? 'bg-secondary text-foreground' : 'text-muted-foreground'}`}
+                      title="Add Documents to Claim"
+                      aria-pressed={showAddDocs}
+                      type="button"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
                   </div>
                 </div>
                 <div className="mt-1 text-sm text-muted-foreground space-y-0.5">
@@ -725,18 +727,18 @@ export default function ClaimReport() {
 
                   <div className="space-y-4">
                     {filteredTimeline.map((event, index) => (
-                      <TimelineEvent
-                        key={event.id}
-                        event={event}
+                    <TimelineEvent
+                      key={event.id}
+                      event={event}
                         patientName={patientName}
                         onToggleKeyEvent={handleToggleKeyEvent}
                         onToggleNeedsReview={handleToggleNeedsReview}
                         onEditRequested={handleEditTimelineEvent}
-                        isFirst={index === 0}
+                      isFirst={index === 0}
                         isLast={index === filteredTimeline.length - 1}
-                        isEditing={isEditing}
-                      />
-                    ))}
+                      isEditing={isEditing}
+                    />
+                  ))}
                   </div>
                 </div>
               </ReportSection>
