@@ -324,22 +324,28 @@ export default function ClaimReport() {
                     {reportTitle}
                   </h1>
                   <Badge variant="ready">Ready</Badge>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <span>{documentCount} documents analyzed</span>
+                    <button
+                      onClick={() => setShowAddDocs(true)}
+                      className="p-1 hover:bg-secondary rounded transition-colors"
+                      title="Add documents"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  {claim.accidentDate && (
-                    <>
-                      <span>Accident Date: {claim.accidentDate}</span>
-                      <span>•</span>
-                    </>
-                  )}
-                  <span>{documentCount} documents analyzed</span>
-                  <button
-                    onClick={() => setShowAddDocs(true)}
-                    className="ml-1 p-1 hover:bg-secondary rounded transition-colors"
-                    title="Add documents"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+                <div className="mt-1 text-sm text-muted-foreground space-y-0.5">
+                  <div>
+                    <span className="font-semibold text-foreground">Accident Type:</span> Slip-and-Fall •{' '}
+                    <span className="font-semibold text-foreground">Date of Incident:</span> {claim.accidentDate} •{' '}
+                    <span className="font-semibold text-foreground">Location:</span> White House
+                  </div>
+                  <div>
+                    <span className="font-semibold text-foreground">Claimant Name:</span> {patientName} •{' '}
+                    <span className="font-semibold text-foreground">Age:</span> 41 •{' '}
+                    <span className="font-semibold text-foreground">Occupation:</span> Professional Photographer
+                  </div>
                 </div>
               </div>
             </div>
