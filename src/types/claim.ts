@@ -64,6 +64,14 @@ export interface BillItem {
   isDuplicate: boolean;
   riskScore: 'high' | 'medium' | 'low';
   documentLink?: string;
+  hcpcsCode?: string;
+  hcpcsDescription?: string;
+  ndcUpcCode?: string;
+  ndcUpcDescription?: string;
+  treatmentType?: string;
+  justification?: string;
+  fileId?: string;
+  fileLink?: string;
 }
 
 export interface ReportSection {
