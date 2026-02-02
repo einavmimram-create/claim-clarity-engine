@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MedicalEvent } from '@/types/claim';
 import { EvidenceLink } from './EvidenceLink';
 import { ChevronRight, AlertTriangle, FileText, Pencil, Star } from 'lucide-react';
@@ -11,6 +11,7 @@ interface TimelineEventProps {
   onToggleKeyEvent?: (eventId: string) => void;
   onToggleNeedsReview?: (eventId: string) => void;
   onEditRequested?: () => void;
+  defaultExpanded?: boolean;
   isFirst?: boolean;
   isLast?: boolean;
   isEditing?: boolean;
@@ -22,11 +23,16 @@ export function TimelineEvent({
   onToggleKeyEvent,
   onToggleNeedsReview,
   onEditRequested,
+  defaultExpanded = false,
   isFirst,
   isLast,
   isEditing = false,
 }: TimelineEventProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+
+  useEffect(() => {
+    setIsExpanded(defaultExpanded);
+  }, [defaultExpanded]);
 
   // Derive expanded content from existing event data or use provided fields
   const narrativeSummary = event.narrativeSummary || event.description;

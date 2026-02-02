@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo, HTMLAttributes } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Edit3, Plus, Save, X } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CalendarDays, Edit3, List, Pencil, Plus, Save, Star, X } from 'lucide-react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { ReportSidebar } from '@/components/report/ReportSidebar';
 import { ReportSection } from '@/components/report/ReportSection';
@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { Calendar } from '@/components/ui/calendar';
 import { toast } from '@/hooks/use-toast';
 import { mockClaims } from '@/data/mockClaims';
 import { getClaimReportData, getReportTitle, getReportType } from '@/utils/reportData';
@@ -39,6 +40,9 @@ export default function ClaimReport() {
   const [showAddDocs, setShowAddDocs] = useState(false);
   const [documentCount, setDocumentCount] = useState(47);
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
+  const [timelineView, setTimelineView] = useState<'list' | 'calendar'>('list');
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   const claim = mockClaims.find((c) => c.id === id) || mockClaims[0];
   
@@ -64,6 +68,8 @@ export default function ClaimReport() {
   const patientName = reportTitle.includes(':')
     ? reportTitle.split(': ').slice(1).join(': ')
     : reportTitle;
+  const accidentDate = claim.accidentDate ? new Date(claim.accidentDate) : undefined;
+  const [calendarMonth, setCalendarMonth] = useState<Date | undefined>(accidentDate);
   const [showTimelineFilters, setShowTimelineFilters] = useState(true);
 
   const [timelineFilters, setTimelineFilters] = useState({
@@ -241,6 +247,53 @@ export default function ClaimReport() {
     });
   }, [timeline, timelineFilters, patientName]);
 
+  const timelineEventsByDate = useMemo(() => {
+    const map = new Map<string, MedicalEvent[]>();
+    filteredTimeline.forEach((event) => {
+      const dateKey = event.date;
+      if (!map.has(dateKey)) {
+        map.set(dateKey, []);
+      }
+      map.get(dateKey)!.push(event);
+    });
+    return map;
+  }, [filteredTimeline]);
+
+  const toDateKey = (date: Date) =>
+    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+  const eventDates = useMemo(() => {
+    return Array.from(timelineEventsByDate.keys()).map((dateStr) => new Date(dateStr));
+  }, [timelineEventsByDate]);
+
+  const selectedDateEvents = useMemo(() => {
+    if (!selectedDate) return [];
+    const key = toDateKey(selectedDate);
+    return timelineEventsByDate.get(key) || [];
+  }, [selectedDate, timelineEventsByDate]);
+
+  const selectedEvent = useMemo(() => {
+    if (!selectedEventId) return null;
+    return filteredTimeline.find((event) => event.id === selectedEventId) || null;
+  }, [filteredTimeline, selectedEventId]);
+
+  const calendarDays = useMemo(() => {
+    const base = calendarMonth || new Date();
+    const year = base.getFullYear();
+    const month = base.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const startOffset = firstDay.getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const days: Array<Date | null> = [];
+    for (let i = 0; i < startOffset; i += 1) {
+      days.push(null);
+    }
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      days.push(new Date(year, month, day));
+    }
+    return days;
+  }, [calendarMonth]);
+
   useEffect(() => {
     if (id && claim.id) {
       const newReportData = getClaimReportData(claim.id);
@@ -250,6 +303,13 @@ export default function ClaimReport() {
       setBills(newReportData.bills);
     }
   }, [id, claim.id]);
+
+  useEffect(() => {
+    if (accidentDate && !selectedDate) {
+      setSelectedDate(accidentDate);
+      setCalendarMonth(accidentDate);
+    }
+  }, [accidentDate, selectedDate]);
 
 
   const handleDocumentsAdded = (count: number) => {
@@ -456,46 +516,75 @@ export default function ClaimReport() {
                 ref={(el) => (sectionRefs.current['medical-timeline'] = el)}
                 id="medical-timeline"
                 title="Medical Timeline (Clinical Milestones)"
+                headerRight={
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setTimelineView('list')}
+                      className={`p-2 rounded border transition-colors ${
+                        timelineView === 'list'
+                          ? 'bg-secondary border-border text-foreground'
+                          : 'border-border text-muted-foreground hover:bg-secondary'
+                      }`}
+                      aria-label="List view"
+                    >
+                      <List className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTimelineView('calendar')}
+                      className={`p-2 rounded border transition-colors ${
+                        timelineView === 'calendar'
+                          ? 'bg-secondary border-border text-foreground'
+                          : 'border-border text-muted-foreground hover:bg-secondary'
+                      }`}
+                      aria-label="Calendar view"
+                    >
+                      <CalendarDays className="w-4 h-4" />
+                    </button>
+                  </>
+                }
               >
-                <div className="mt-4 space-y-4">
-                  <div className="bg-card border border-border rounded-lg">
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                      <h4 className="text-sm font-medium text-foreground">Filters</h4>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowTimelineFilters((prev) => !prev)}
-                      >
-                        {showTimelineFilters ? 'Hide' : 'Show'}
-                      </Button>
-                    </div>
-                    {showTimelineFilters && (
-                      <div className="p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Patient Name</p>
-                            <Select
-                              value={timelineFilters.patientName || 'all'}
-                              onValueChange={(value) =>
-                                setTimelineFilters((prev) => ({
-                                  ...prev,
-                                  patientName: value === 'all' ? '' : value,
-                                }))
-                              }
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="all">All</SelectItem>
-                                {timelineFilterOptions.patientNames.map((name) => (
-                                  <SelectItem key={name} value={name}>
-                                    {name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
+                {timelineView === 'list' ? (
+                  <div className="mt-4 space-y-4">
+                    <div className="bg-card border border-border rounded-lg">
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                        <h4 className="text-sm font-medium text-foreground">Filters</h4>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowTimelineFilters((prev) => !prev)}
+                        >
+                          {showTimelineFilters ? 'Hide' : 'Show'}
+                        </Button>
+                      </div>
+                      {showTimelineFilters && (
+                        <div className="p-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">Patient Name</p>
+                              <Select
+                                value={timelineFilters.patientName || 'all'}
+                                onValueChange={(value) =>
+                                  setTimelineFilters((prev) => ({
+                                    ...prev,
+                                    patientName: value === 'all' ? '' : value,
+                                  }))
+                                }
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="all">All</SelectItem>
+                                  {timelineFilterOptions.patientNames.map((name) => (
+                                    <SelectItem key={name} value={name}>
+                                      {name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
 
                           <div>
                             <p className="text-xs text-muted-foreground mb-1">Doctor Name</p>
@@ -739,20 +828,215 @@ export default function ClaimReport() {
 
                   <div className="space-y-4">
                     {filteredTimeline.map((event, index) => (
-                    <TimelineEvent
-                      key={event.id}
-                      event={event}
+                      <TimelineEvent
+                        key={event.id}
+                        event={event}
                         patientName={patientName}
                         onToggleKeyEvent={handleToggleKeyEvent}
                         onToggleNeedsReview={handleToggleNeedsReview}
                         onEditRequested={handleEditTimelineEvent}
-                      isFirst={index === 0}
+                        isFirst={index === 0}
                         isLast={index === filteredTimeline.length - 1}
-                      isEditing={isEditing}
-                    />
-                  ))}
+                        isEditing={isEditing}
+                      />
+                    ))}
                   </div>
                 </div>
+                ) : (
+                  <div className="mt-4 flex flex-col lg:flex-row gap-4">
+                    <div className="bg-card border border-border rounded-lg p-4 lg:w-[72%]">
+                      <div className="flex items-center justify-between mb-4">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCalendarMonth((prev) => {
+                              const base = prev || new Date();
+                              return new Date(base.getFullYear(), base.getMonth() - 1, 1);
+                            })
+                          }
+                          className="text-sm text-muted-foreground hover:text-foreground"
+                        >
+                          &lt; Previous Month
+                        </button>
+                        <div className="text-sm font-medium text-foreground">
+                          {(calendarMonth || new Date()).toLocaleString('default', {
+                            month: 'long',
+                            year: 'numeric',
+                          })}
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setCalendarMonth((prev) => {
+                                const base = prev || new Date();
+                                return new Date(base.getFullYear(), base.getMonth() + 1, 1);
+                              })
+                            }
+                            className="text-sm text-muted-foreground hover:text-foreground"
+                          >
+                            Next Month &gt;
+                          </button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (!accidentDate) return;
+                              setCalendarMonth(new Date(accidentDate.getFullYear(), accidentDate.getMonth(), 1));
+                              setSelectedDate(accidentDate);
+                              const key = toDateKey(accidentDate);
+                              const accidentEvents = timelineEventsByDate.get(key) || [];
+                              setSelectedEventId(accidentEvents[0]?.id || null);
+                            }}
+                          >
+                            Go to Accident
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
+                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                          <div key={day} className="bg-card text-xs text-muted-foreground p-2 text-center font-medium">
+                            {day}
+                          </div>
+                        ))}
+                        {calendarDays.map((date, idx) => {
+                          if (!date) {
+                            return <div key={`empty-${idx}`} className="bg-card min-h-[120px]" />;
+                          }
+                          const key = toDateKey(date);
+                          const dayEvents = timelineEventsByDate.get(key) || [];
+                          const isAccidentDay =
+                            accidentDate && toDateKey(accidentDate) === key;
+                          const isSelected =
+                            selectedDate && toDateKey(selectedDate) === key;
+                          const visibleEvents = dayEvents.slice(0, 2);
+                          const overflowCount = Math.max(dayEvents.length - visibleEvents.length, 0);
+
+                          return (
+                            <div
+                              key={key}
+                              className={`bg-card min-h-[120px] p-2 flex flex-col gap-1 cursor-pointer ${
+                                isSelected ? 'ring-2 ring-primary' : ''
+                              } ${isAccidentDay ? 'bg-red-500/10' : ''}`}
+                              onClick={() => {
+                                setSelectedDate(date);
+                                setSelectedEventId(null);
+                                if (dayEvents.length === 1) {
+                                  setSelectedEventId(dayEvents[0].id);
+                                }
+                              }}
+                            >
+                              <div className={`text-xs font-medium ${isAccidentDay ? 'text-red-600' : 'text-foreground'}`}>
+                                {date.getDate()}
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                {visibleEvents.map((event) => (
+                                  <button
+                                    key={event.id}
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedDate(date);
+                                      setSelectedEventId(event.id);
+                                    }}
+                                    className={`text-left text-[11px] px-2 py-1 rounded bg-primary/10 text-foreground hover:bg-primary/20`}
+                                  >
+                                    {event.eventType}
+                                  </button>
+                                ))}
+                                {overflowCount > 0 && (
+                                  <div className="text-[11px] text-muted-foreground">+{overflowCount} more</div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="lg:w-[28%]">
+                      {selectedEvent ? (
+                        <div
+                          className={`bg-white shadow-md rounded-lg border-l-4 p-4 ${
+                            accidentDate && toDateKey(new Date(selectedEvent.date)) === toDateKey(accidentDate)
+                              ? 'border-red-500'
+                              : 'border-border'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(selectedEvent.date).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                })}
+                              </p>
+                              <h3 className="text-lg font-semibold text-foreground">{selectedEvent.eventType}</h3>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => handleToggleKeyEvent(selectedEvent.id)}
+                                className={`w-8 h-8 flex items-center justify-center rounded hover:bg-secondary/50 ${
+                                  selectedEvent.isKeyDate ? 'text-yellow-500' : 'text-muted-foreground'
+                                }`}
+                                aria-label="Toggle key event"
+                              >
+                                <Star className={`w-4 h-4 ${selectedEvent.isKeyDate ? 'fill-yellow-500' : ''}`} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleEditTimelineEvent}
+                                className="w-8 h-8 flex items-center justify-center rounded hover:bg-secondary/50 text-muted-foreground"
+                                aria-label="Edit event"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleToggleNeedsReview(selectedEvent.id)}
+                                className={`w-8 h-8 flex items-center justify-center rounded hover:bg-secondary/50 ${
+                                  selectedEvent.needsReview ? 'text-destructive' : 'text-muted-foreground'
+                                }`}
+                                aria-label="Toggle needs review"
+                              >
+                                <AlertTriangle className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                          <p className="mt-3 text-sm text-foreground/90">{selectedEvent.description}</p>
+                          <div className="mt-4 grid grid-cols-2 gap-3">
+                            <div>
+                              <p className="text-xs font-bold text-gray-400 uppercase">Patient Name</p>
+                              <p className="text-sm text-foreground">{selectedEvent.patientName || patientName || '—'}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-gray-400 uppercase">Doctor</p>
+                              <p className="text-sm text-foreground">
+                                {selectedEvent.doctorName || (selectedEvent.provider.startsWith('Dr.') ? selectedEvent.provider : '—')}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-gray-400 uppercase">Facility</p>
+                              <p className="text-sm text-foreground">
+                                {selectedEvent.medicalFacility || (!selectedEvent.provider.startsWith('Dr.') ? selectedEvent.provider : '—')}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-gray-400 uppercase">Specialty</p>
+                              <p className="text-sm text-foreground">{selectedEvent.specialty}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="bg-white shadow-md rounded-lg p-4 text-sm text-muted-foreground">
+                          Select an event to view details.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </ReportSection>
 
               {/* Contradictions - Only for Full Report */}
