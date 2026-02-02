@@ -1103,7 +1103,7 @@ export default function ClaimReport() {
                   <div className="bg-report-section rounded-lg p-4">
                     <h4 className="font-medium text-foreground mb-2">Compatibility Assessment</h4>
                     <p className={`text-foreground/90 ${editableBlockClass}`} {...editableAttributes}>
-                      MRI-confirmed extrusion and neurological findings show strong support for an acute traumatic origin.
+                      MRI-confirmed extrusion and neurological findings show <strong>strong support</strong> for an acute traumatic origin.
                     </p>
                   </div>
                 </ReportSection>
