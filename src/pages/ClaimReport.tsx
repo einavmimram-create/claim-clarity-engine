@@ -38,6 +38,7 @@ export default function ClaimReport() {
   const { id } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [showAddDocs, setShowAddDocs] = useState(false);
+  const [showTimeSensitive, setShowTimeSensitive] = useState(false);
   const [documentCount, setDocumentCount] = useState(47);
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
   const [timelineView, setTimelineView] = useState<'list' | 'calendar'>('list');
@@ -396,6 +397,13 @@ export default function ClaimReport() {
                     {reportTitle}
                   </h1>
                   <Badge variant="ready">Ready</Badge>
+                  <button
+                    type="button"
+                    onClick={() => setShowTimeSensitive((prev) => !prev)}
+                    className="inline-flex items-center rounded-md bg-destructive px-2.5 py-1 text-xs font-medium text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    TIME SENSITIVE DEMAND
+                  </button>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <span>{documentCount} documents analyzed</span>
                   <button
@@ -409,6 +417,21 @@ export default function ClaimReport() {
                   </button>
                   </div>
                 </div>
+                {showTimeSensitive && (
+                  <div className="mt-2 space-y-1">
+                    <div className="inline-flex items-center rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+                      this demand should be responsded by 2007-04-30
+                    </div>
+                    <a
+                      href="/scheduling-procedures-order.html#april-30-2007"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-xs text-report-link hover:underline"
+                    >
+                      SCHEDULING AND PROCEDURES ORDER
+                    </a>
+                  </div>
+                )}
                 <div className="mt-1 text-sm text-muted-foreground space-y-0.5">
                   <div>
                     <span className="font-semibold text-foreground">Accident Type:</span> Slip-and-Fall •{' '}
