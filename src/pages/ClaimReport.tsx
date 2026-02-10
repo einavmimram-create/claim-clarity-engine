@@ -423,7 +423,7 @@ export default function ClaimReport() {
                     this demand should be responsded by 2006-12-08
                     </div>
                     <a
-                      href="/scheduling-procedures-order.html#april-30-2007"
+                      href="/SCHEDULING%20AND%20PROCEDURES%20ORDER.pdf#page=6"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block text-xs text-report-link hover:underline"
