@@ -59,15 +59,15 @@ const exposureDrivers: ExposureDriver[] = [
 ];
 
 const riskColors = {
-  low: 'bg-success border-success',
+  low: 'bg-destructive border-destructive',
   medium: 'bg-warning border-warning',
-  high: 'bg-destructive border-destructive',
+  high: 'bg-success border-success',
 };
 
 const riskBadgeVariants = {
-  low: 'low' as const,
+  low: 'high' as const,
   medium: 'medium' as const,
-  high: 'high' as const,
+  high: 'low' as const,
 };
 
 const riskSupportText = {
@@ -201,7 +201,7 @@ export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
       {/* Legend */}
       <div className="mt-4 flex justify-center gap-4 text-xs">
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-full bg-success" />
+          <div className="w-3 h-3 rounded-full bg-destructive" />
           <span className="text-muted-foreground">Limited Support</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -209,7 +209,7 @@ export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
           <span className="text-muted-foreground">Moderate Support</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-full bg-destructive" />
+          <div className="w-3 h-3 rounded-full bg-success" />
           <span className="text-muted-foreground">Strong Support</span>
         </div>
       </div>

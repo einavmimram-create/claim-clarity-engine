@@ -420,7 +420,7 @@ export default function ClaimReport() {
                 {showTimeSensitive && (
                   <div className="mt-2 space-y-1">
                     <div className="inline-flex items-center rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
-                    this demand should be responsded by 2006-04-01
+                    this demand should be responsded by 2006-12-08
                     </div>
                     <a
                       href="/scheduling-procedures-order.html#april-30-2007"
@@ -440,7 +440,7 @@ export default function ClaimReport() {
                   </div>
                   <div>
                     <span className="font-semibold text-foreground">Claimant Name:</span> {patientName} •{' '}
-                    <span className="font-semibold text-foreground">Age:</span> 41 •{' '}
+                    <span className="font-semibold text-foreground">Date of Birth:</span> 1974-03-11 •{' '}
                     <span className="font-semibold text-foreground">Occupation:</span> Professional Photographer
                   </div>
                 </div>
