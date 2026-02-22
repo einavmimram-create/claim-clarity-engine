@@ -34,7 +34,6 @@ export function ReportSidebar({ reportType, isFutureReport = false }: ReportSide
     { id: 'causation-analysis', title: 'Mechanism of Injury' },
     { id: 'injury-separation', title: 'Medical Condition Classification' },
     { id: 'treatment-mapping', title: 'Treatment-to-Diagnosis Mapping' },
-    { id: 'causation-confidence', title: 'Causation Summary' },
   ];
 
   const baseBillingSubsections: Subsection[] = [

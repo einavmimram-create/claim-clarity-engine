@@ -8,7 +8,6 @@ import { TimelineEvent } from '@/components/report/TimelineEvent';
 import { ContradictionCard } from '@/components/report/ContradictionCard';
 import { MissingFlagCard } from '@/components/report/MissingFlagCard';
 import { BillsTable } from '@/components/report/BillsTable';
-import { ConfidenceIndicator } from '@/components/report/ConfidenceIndicator';
 import { EvidenceLink } from '@/components/report/EvidenceLink';
 import { ExportMenu } from '@/components/report/ExportMenu';
 import { ExposureDriversPanel } from '@/components/report/ExposureDriversPanel';
@@ -1297,21 +1296,6 @@ export default function ClaimReport() {
                 </ReportSection>
               )}
 
-              {/* Causation Summary - Only for Full Report */}
-              {!isMVP && (
-                <ReportSection
-                  ref={(el) => (sectionRefs.current['causation-confidence'] = el)}
-                  id="causation-confidence"
-                  title="Causation Summary"
-                >
-                  <ConfidenceIndicator
-                    level="high"
-                    label="Strong Support for Accident-Related Causation"
-                    description="Available records show strong support for a traumatic disc extrusion associated with the reported fall."
-                    isEditing={isEditing}
-                  />
-                </ReportSection>
-              )}
 
               {/* Medical Billing Review */}
               <ReportSection

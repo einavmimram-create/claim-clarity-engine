@@ -271,6 +271,5 @@ export const reportSections = [
   { id: 'causation-analysis', title: 'Causation Analysis', order: 6 },
   { id: 'injury-separation', title: 'Medical Condition Classification', order: 7 },
   { id: 'treatment-mapping', title: 'Treatment-to-Diagnosis Mapping', order: 8 },
-  { id: 'causation-confidence', title: 'Causation Summary', order: 9 },
-  { id: 'medical-billing-review', title: 'Medical Billing Review', order: 10 },
+  { id: 'medical-billing-review', title: 'Medical Billing Review', order: 9 },
 ];
