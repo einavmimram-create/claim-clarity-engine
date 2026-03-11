@@ -1,4 +1,5 @@
 import { MedicalEvent, Contradiction, MissingFlag, BillItem, Claim } from '@/types/claim';
+import { reportCopyHe } from '@/data/reportCopyHe';
 
 // Base Luke Frazza case data (template)
 const baseTimeline: MedicalEvent[] = [
@@ -252,19 +253,19 @@ const baseBills: BillItem[] = [
   { id: '9', date: '2006-01-16', provider: 'Imaging Center', description: 'Post-op MRI', amount: 1132.12, category: 'Imaging', isAccidentRelated: true, hasMatchingTreatment: true, isDuplicate: false, riskScore: 'low' as const, hcpcsCode: '72158', hcpcsDescription: 'MRI lumbar spine with/without contrast', treatmentType: 'Diagnostic', justification: 'Follow-up imaging to evaluate recurrence; supports ongoing accident-related care.', fileId: 'MRI-009', fileLink: '/Attachment 4.html#page4' },
 ];
 
-export type ReportType = 'full' | 'mvp';
+export type ReportType = 'full' | 'mvp' | 'full_he';
 
 /**
  * Determines the report type based on claim name
  */
 export function getReportType(claim: Claim): ReportType {
-  // Claim "Johnson v. Metro Transit Authority" -> Full Report
+  // Claim "Johnson v. Metro Transit Authority" -> Full Report (English)
   if (claim.id === '1' || (claim.name && claim.name.includes('Johnson'))) {
     return 'full';
   }
-  // Claim "Smith – Rear-End Collision MVA" -> MVP Report
+  // Claim "Smith – Rear-End Collision MVA" -> Full Report (Hebrew version, independent from English full report)
   if (claim.id === '2' || (claim.name && claim.name.includes('Smith'))) {
-    return 'mvp';
+    return 'full_he';
   }
   // Default to 'full' for other claims
   return 'full';
@@ -280,8 +281,12 @@ export function getReportTitle(claim: Claim): string {
   }
   
   const reportType = getReportType(claim);
+  const patientName = 'Luke Frazza';
+  if (reportType === 'full_he') {
+    return reportCopyHe.reportTitleWithPatient(patientName);
+  }
   const reportTypeLabel = reportType === 'full' ? 'Full Report' : 'MVP Report';
-  return `${reportTypeLabel}: Luke Frazza`;
+  return `${reportTypeLabel}: ${patientName}`;
 }
 
 /**
@@ -316,9 +321,9 @@ function getMVPBills(): BillItem[] {
  */
 export function getClaimReportData(claimId: string) {
   const reportType = getReportType({ id: claimId } as Claim);
-  
-  // For MVP reports, use MVP-specific bills
-  const bills = reportType === 'mvp' 
+
+  // For MVP reports, use MVP-specific bills; full and full_he use full report bills
+  const bills = reportType === 'mvp'
     ? deepCloneArray(getMVPBills())
     : deepCloneArray(baseBills);
   

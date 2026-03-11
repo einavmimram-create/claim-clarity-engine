@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { ReportType } from '@/utils/reportData';
+import { reportCopyHe } from '@/data/reportCopyHe';
 
 interface ReportSidebarProps {
   reportType?: ReportType;
@@ -20,30 +21,32 @@ interface SectionWithSubsections {
 
 export function ReportSidebar({ reportType, isFutureReport = false }: ReportSidebarProps) {
   const isMVP = reportType === 'mvp';
+  const isHebrew = reportType === 'full_he';
+  const t = isHebrew ? reportCopyHe.sidebar : null;
   const [activeSection, setActiveSection] = useState<string>('executive-summary');
-  
-  // Define section hierarchy
+
+  // Define section hierarchy (English; Hebrew uses reportCopyHe.sidebar when isHebrew)
   const medicalNarrativeSubsections: Subsection[] = [
-    { id: 'medical-narrative', title: 'Claimant Medical Summary' },
-    { id: 'medical-timeline', title: 'Medical Timeline' },
-    { id: 'contradictions', title: 'Contradictions & Inconsistencies' },
-    { id: 'missing-docs', title: 'Missing Documentation' },
+    { id: 'medical-narrative', title: t?.claimantMedicalSummary ?? 'Claimant Medical Summary' },
+    { id: 'medical-timeline', title: t?.medicalTimeline ?? 'Medical Timeline' },
+    { id: 'contradictions', title: t?.contradictionsInconsistencies ?? 'Contradictions & Inconsistencies' },
+    { id: 'missing-docs', title: t?.missingDocumentation ?? 'Missing Documentation' },
   ];
 
   const causationAnalysisSubsections: Subsection[] = [
-    { id: 'causation-analysis', title: 'Mechanism of Injury' },
-    { id: 'injury-separation', title: 'Medical Condition Classification' },
-    { id: 'treatment-mapping', title: 'Treatment-to-Diagnosis Mapping' },
+    { id: 'causation-analysis', title: t?.mechanismOfInjury ?? 'Mechanism of Injury' },
+    { id: 'injury-separation', title: t?.medicalConditionClassification ?? 'Medical Condition Classification' },
+    { id: 'treatment-mapping', title: t?.treatmentToDiagnosisMapping ?? 'Treatment-to-Diagnosis Mapping' },
   ];
 
   const baseBillingSubsections: Subsection[] = [
-    { id: 'billing-overview', title: 'Billing Overview' },
-    { id: 'line-item-billing-review', title: 'Line-Item Billing Review' },
-    { id: 'billing-issues-exceptions', title: 'Billing Issues & Exceptions' },
+    { id: 'billing-overview', title: t?.billingOverview ?? 'Billing Overview' },
+    { id: 'line-item-billing-review', title: t?.lineItemBillingReview ?? 'Line-Item Billing Review' },
+    { id: 'billing-issues-exceptions', title: t?.billingIssuesExceptions ?? 'Billing Issues & Exceptions' },
   ];
 
   const fullReportBillingSubsections: Subsection[] = [
-    { id: 'high-impact-bills', title: 'High Impact Bills' },
+    { id: 'high-impact-bills', title: t?.highImpactBills ?? 'High Impact Bills' },
   ];
 
   const billingSubsections = isMVP
@@ -58,28 +61,34 @@ export function ReportSidebar({ reportType, isFutureReport = false }: ReportSide
     { id: 'reserve-guidance', title: 'Reserve Guidance' },
   ];
 
-  // Build structured sections
+  const executiveSummaryTitle = t?.executiveSummary ?? 'Executive Summary';
+  const medicalNarrativeTitle = t?.medicalNarrative ?? 'Medical Narrative';
+  const causationAnalysisTitle = t?.causationAnalysis ?? 'Causation Analysis';
+  const medicalBillingReviewTitle = t?.medicalBillingReview ?? 'Medical Billing Review';
+
+  // Build structured sections (Hebrew version excludes Medical Billing Review)
   const structuredSections: SectionWithSubsections[] = [
-    { id: 'executive-summary', title: 'Executive Summary' },
+    { id: 'executive-summary', title: executiveSummaryTitle },
     {
       id: 'medical-narrative',
-      title: 'Medical Narrative',
+      title: medicalNarrativeTitle,
       subsections: isMVP
         ? [medicalNarrativeSubsections[1]] // Only Medical Timeline for MVP
         : medicalNarrativeSubsections,
     },
     {
       id: 'causation-analysis',
-      title: 'Causation Analysis',
+      title: causationAnalysisTitle,
       subsections: isMVP
         ? [causationAnalysisSubsections[0]] // Only Mechanism of Injury for MVP
         : causationAnalysisSubsections,
     },
-    {
+    // Medical Billing Review: hidden in Hebrew report (full_he)
+    ...(isHebrew ? [] : [{
       id: 'medical-billing-review',
-      title: 'Medical Billing Review',
+      title: medicalBillingReviewTitle,
       subsections: billingSubsections,
-    },
+    }]),
     // Add Next Steps section only for Future Report
     ...(isFutureReport ? [{
       id: 'next-steps',
@@ -160,7 +169,7 @@ export function ReportSidebar({ reportType, isFutureReport = false }: ReportSide
     handleScroll();
     
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isMVP, isFutureReport]);
+  }, [isMVP, isFutureReport, isHebrew]);
 
   const handleClick = (sectionId: string) => {
     setActiveSection(sectionId);

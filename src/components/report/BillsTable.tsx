@@ -29,10 +29,15 @@ export function BillsTable({ bills, showRiskOnly = false, isEditing = false }: B
     ? 'border border-dashed border-border rounded hover:border-primary cursor-text'
     : '';
 
-  const supportLevelText = {
-    low: 'Strong Support',
-    medium: 'Moderate Support',
-    high: 'Limited Support',
+  const supportLevelText: Record<'low' | 'medium' | 'high', string> = {
+    low: 'Accident-Related',
+    medium: 'Pre-Existing',
+    high: 'Pre-Existing',
+  };
+  const supportLevelVariant: Record<'low' | 'medium' | 'high', 'low' | 'high'> = {
+    low: 'low',
+    medium: 'high',
+    high: 'high',
   };
 
   const billingTypeText = (bill: BillItem) => {
@@ -120,7 +125,7 @@ export function BillsTable({ bills, showRiskOnly = false, isEditing = false }: B
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="inline-flex items-center gap-2">
-                      <Badge variant={bill.riskScore}>
+                      <Badge variant={supportLevelVariant[bill.riskScore]}>
                         <span className={editableClass} {...editableAttributes}>
                           {supportLevelText[bill.riskScore]}
                         </span>

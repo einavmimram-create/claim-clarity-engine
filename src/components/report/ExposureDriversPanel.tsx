@@ -58,22 +58,24 @@ const exposureDrivers: ExposureDriver[] = [
   },
 ];
 
-const riskColors = {
-  low: 'bg-destructive border-destructive',
-  medium: 'bg-warning border-warning',
-  high: 'bg-success border-success',
+// Map riskScore to display: high = accident-related (green), medium/low = pre-existing (red)
+type SupportCategory = 'pre-existing' | 'accident-related';
+const getSupportCategory = (riskScore: 'low' | 'medium' | 'high'): SupportCategory =>
+  riskScore === 'high' ? 'accident-related' : 'pre-existing';
+
+const supportCategoryColors: Record<SupportCategory, string> = {
+  'pre-existing': 'bg-destructive border-destructive',
+  'accident-related': 'bg-success border-success',
 };
 
-const riskBadgeVariants = {
-  low: 'high' as const,
-  medium: 'medium' as const,
-  high: 'low' as const,
+const supportCategoryBadgeVariant: Record<SupportCategory, 'high' | 'low'> = {
+  'pre-existing': 'high',
+  'accident-related': 'low',
 };
 
-const riskSupportText = {
-  low: 'Limited record support for accident relation',
-  medium: 'Moderate record support for accident relation',
-  high: 'Strong record support for accident relation',
+const supportCategoryLabel: Record<SupportCategory, string> = {
+  'pre-existing': 'Pre-Existing',
+  'accident-related': 'Accident-Related',
 };
 
 interface ExposureDriversPanelProps {
@@ -121,7 +123,7 @@ export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
                       setHoveredDriver(null);
                     }
                   }}
-                  className={`absolute w-3 h-3 rounded-full ${riskColors[driver.riskScore]} border-2 
+                  className={`absolute w-3 h-3 rounded-full ${supportCategoryColors[getSupportCategory(driver.riskScore)]} border-2 
                     cursor-pointer transition-all duration-200 hover:scale-125 hover:shadow-lg
                     z-20 -translate-x-1/2 -translate-y-1/2 ${isSelected ? 'ring-2 ring-primary ring-offset-2' : ''}`}
                   style={{ top: driver.position.top, left: driver.position.left }}
@@ -157,8 +159,8 @@ export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground text-sm">{driver.bodyPart}</h3>
-                        <Badge variant={riskBadgeVariants[driver.riskScore]} className="mt-1 text-xs">
-                          {riskSupportText[driver.riskScore]}
+                        <Badge variant={supportCategoryBadgeVariant[getSupportCategory(driver.riskScore)]} className="mt-1 text-xs">
+                          {supportCategoryLabel[getSupportCategory(driver.riskScore)]}
                         </Badge>
                       </div>
                       {isSelected && (
@@ -199,18 +201,14 @@ export function ExposureDriversPanel({ isEditing }: ExposureDriversPanelProps) {
       </div>
 
       {/* Legend */}
-      <div className="mt-4 flex justify-center gap-4 text-xs">
+      <div className="mt-4 flex justify-center gap-6 text-xs">
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-destructive" />
-          <span className="text-muted-foreground">Limited Support</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-full bg-warning" />
-          <span className="text-muted-foreground">Moderate Support</span>
+          <span className="text-muted-foreground">Pre-Existing</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-success" />
-          <span className="text-muted-foreground">Strong Support</span>
+          <span className="text-muted-foreground">Accident-Related</span>
         </div>
       </div>
     </div>

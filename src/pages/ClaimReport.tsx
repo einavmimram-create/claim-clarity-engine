@@ -31,6 +31,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { toast } from '@/hooks/use-toast';
 import { mockClaims } from '@/data/mockClaims';
 import { getClaimReportData, getReportTitle, getReportType } from '@/utils/reportData';
+import { reportCopyHe } from '@/data/reportCopyHe';
 import { MedicalEvent, Contradiction, MissingFlag, BillItem } from '@/types/claim';
 
 export default function ClaimReport() {
@@ -64,6 +65,7 @@ export default function ClaimReport() {
   const reportTitle = getReportTitle(claim);
   const reportType = getReportType(claim);
   const isMVP = reportType === 'mvp';
+  const isHebrew = reportType === 'full_he';
   const isFutureReport = claim.id === '3' || reportTitle.includes('Future Report');
   const patientName = reportTitle.includes(':')
     ? reportTitle.split(': ').slice(1).join(': ')
@@ -473,7 +475,11 @@ export default function ClaimReport() {
 
       {/* Report Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex gap-8">
+        <div
+          className="flex gap-8"
+          dir={isHebrew ? 'rtl' : undefined}
+          lang={isHebrew ? 'he' : undefined}
+        >
           <ReportSidebar reportType={reportType} isFutureReport={isFutureReport} />
           <div className="flex-1 max-w-4xl">
             <div className={`bg-report-bg rounded-xl border border-border p-8 shadow-card ${isEditing ? 'ring-2 ring-primary/20' : ''}`}>
@@ -487,7 +493,7 @@ export default function ClaimReport() {
               <ReportSection
                 ref={(el) => (sectionRefs.current['executive-summary'] = el)}
                 id="executive-summary"
-                title="Executive Summary"
+                title={isHebrew ? reportCopyHe.reportSections.executiveSummary : 'Executive Summary'}
               >
                 <div className={`flex gap-6 ${isMVP ? '' : 'flex-col lg:flex-row'}`}>
                   {/* Left side: Summary text */}
@@ -520,7 +526,7 @@ export default function ClaimReport() {
                 <ReportSection
                   ref={(el) => (sectionRefs.current['medical-narrative'] = el)}
                   id="medical-narrative"
-                  title="Medical Narrative"
+                  title={isHebrew ? reportCopyHe.reportSections.medicalNarrative : 'Medical Narrative'}
                 >
                   <h3 className="font-semibold text-foreground mb-3">Claimant Medical Summary</h3>
                   <p className={`mb-4 ${editableBlockClass}`} {...editableAttributes}>
@@ -537,7 +543,7 @@ export default function ClaimReport() {
               <ReportSection
                 ref={(el) => (sectionRefs.current['medical-timeline'] = el)}
                 id="medical-timeline"
-                title="Medical Timeline (Clinical Milestones)"
+                title={isHebrew ? reportCopyHe.reportSections.medicalTimeline : 'Medical Timeline (Clinical Milestones)'}
                 headerRight={
                   <>
                     <button
@@ -1066,7 +1072,7 @@ export default function ClaimReport() {
                 <ReportSection
                   ref={(el) => (sectionRefs.current['contradictions'] = el)}
                   id="contradictions"
-                  title="Contradictions & Inconsistencies"
+                  title={isHebrew ? reportCopyHe.reportSections.contradictionsInconsistencies : 'Contradictions & Inconsistencies'}
                 >
                   <div className="space-y-4">
                     {contradictions.map((contradiction) => (
@@ -1085,7 +1091,7 @@ export default function ClaimReport() {
                 <ReportSection
                   ref={(el) => (sectionRefs.current['missing-docs'] = el)}
                   id="missing-docs"
-                  title="Missing Documentation"
+                  title={isHebrew ? reportCopyHe.reportSections.missingDocumentation : 'Missing Documentation'}
                 >
                   <div className="space-y-4">
                     {missingFlags.map((flag) => (
@@ -1100,7 +1106,7 @@ export default function ClaimReport() {
                 <ReportSection
                   ref={(el) => (sectionRefs.current['causation-analysis'] = el)}
                   id="causation-analysis"
-                  title="Causation Analysis"
+                  title={isHebrew ? reportCopyHe.reportSections.causationAnalysis : 'Causation Analysis'}
                 >
                   <div className="bg-report-section rounded-lg p-4">
                     <h4 className="font-medium text-foreground mb-2">Mechanism of Injury</h4>
@@ -1113,7 +1119,7 @@ export default function ClaimReport() {
                 <ReportSection
                   ref={(el) => (sectionRefs.current['causation-analysis'] = el)}
                   id="causation-analysis"
-                  title="Causation Analysis"
+                  title={isHebrew ? reportCopyHe.reportSections.causationAnalysis : 'Causation Analysis'}
                 >
                   <div className="bg-report-section rounded-lg p-4 mb-4">
                     <h4 className="font-medium text-foreground mb-2">Mechanism of Injury</h4>
@@ -1135,7 +1141,7 @@ export default function ClaimReport() {
               <ReportSection
                 ref={(el) => (sectionRefs.current['injury-separation'] = el)}
                 id="injury-separation"
-                title="Medical Condition Classification"
+                title={isHebrew ? reportCopyHe.reportSections.medicalConditionClassification : 'Medical Condition Classification'}
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Pre-Existing Medical Conditions */}
@@ -1197,7 +1203,7 @@ export default function ClaimReport() {
                 <ReportSection
                   ref={(el) => (sectionRefs.current['treatment-mapping'] = el)}
                   id="treatment-mapping"
-                  title="Treatment-to-Diagnosis Mapping"
+                  title={isHebrew ? reportCopyHe.reportSections.treatmentToDiagnosisMapping : 'Treatment-to-Diagnosis Mapping'}
                 >
                   <div className="border border-border rounded-lg overflow-hidden">
                     <table className="w-full">
@@ -1219,7 +1225,7 @@ export default function ClaimReport() {
                           </td>
                           <td className="px-4 py-3 text-center">
                             <Badge variant="low">
-                              <span className={editableInlineClass} {...editableAttributes}>Strong Support</span>
+                              <span className={editableInlineClass} {...editableAttributes}>Accident-Related</span>
                             </Badge>
                           </td>
                           <td className="px-4 py-3 text-sm text-foreground">
@@ -1235,7 +1241,7 @@ export default function ClaimReport() {
                           </td>
                           <td className="px-4 py-3 text-center">
                             <Badge variant="low">
-                              <span className={editableInlineClass} {...editableAttributes}>Strong Support</span>
+                              <span className={editableInlineClass} {...editableAttributes}>Accident-Related</span>
                             </Badge>
                           </td>
                           <td className="px-4 py-3 text-sm text-foreground">
@@ -1251,7 +1257,7 @@ export default function ClaimReport() {
                           </td>
                           <td className="px-4 py-3 text-center">
                             <Badge variant="high">
-                              <span className={editableInlineClass} {...editableAttributes}>Limited Support</span>
+                              <span className={editableInlineClass} {...editableAttributes}>Pre-Existing</span>
                             </Badge>
                           </td>
                           <td className="px-4 py-3 text-sm text-foreground">
@@ -1267,7 +1273,7 @@ export default function ClaimReport() {
                           </td>
                           <td className="px-4 py-3 text-center">
                             <Badge variant="low">
-                              <span className={editableInlineClass} {...editableAttributes}>Strong Support</span>
+                              <span className={editableInlineClass} {...editableAttributes}>Accident-Related</span>
                             </Badge>
                           </td>
                           <td className="px-4 py-3 text-sm text-foreground">
@@ -1282,8 +1288,8 @@ export default function ClaimReport() {
                             <span className={editableInlineClass} {...editableAttributes}>Referred pain</span>
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <Badge variant="medium">
-                              <span className={editableInlineClass} {...editableAttributes}>Moderate Support</span>
+                            <Badge variant="high">
+                              <span className={editableInlineClass} {...editableAttributes}>Pre-Existing</span>
                             </Badge>
                           </td>
                           <td className="px-4 py-3 text-sm text-foreground">
@@ -1297,7 +1303,8 @@ export default function ClaimReport() {
               )}
 
 
-              {/* Medical Billing Review */}
+              {/* Medical Billing Review - hidden in Hebrew report */}
+              {!isHebrew && (
               <ReportSection
                 ref={(el) => (sectionRefs.current['medical-billing-review'] = el)}
                 id="medical-billing-review"
@@ -1311,7 +1318,7 @@ export default function ClaimReport() {
                 >
                   <div className="bg-success/10 rounded-lg p-4 h-full flex flex-col justify-center text-center">
                     <div className="h-4" />
-                    <p className={`text-xs text-success leading-none ${editableInlineClass}`} {...editableAttributes}>Strong Support for Accident Relation</p>
+                    <p className={`text-xs text-success leading-none ${editableInlineClass}`} {...editableAttributes}>Accident-Related</p>
                     <p className={`text-2xl font-semibold text-success leading-none ${editableInlineClass}`} {...editableAttributes}>
                       {formatCurrency(accidentRelatedBilled)}
                     </p>
@@ -1322,7 +1329,7 @@ export default function ClaimReport() {
                   </div>
                   <div className="bg-destructive/10 rounded-lg p-4 h-full flex flex-col justify-center text-center">
                     <div className="h-4" />
-                    <p className={`text-xs text-destructive leading-none ${editableInlineClass}`} {...editableAttributes}>Limited Support for Accident Relation</p>
+                    <p className={`text-xs text-destructive leading-none ${editableInlineClass}`} {...editableAttributes}>Pre-Existing</p>
                     <p className={`text-2xl font-semibold text-destructive leading-none ${editableInlineClass}`} {...editableAttributes}>
                       {formatCurrency(unrelatedBilled)}
                     </p>
@@ -1404,13 +1411,14 @@ export default function ClaimReport() {
                   </div>
                 )}
               </ReportSection>
+              )}
 
               {/* Next Steps Section - Only for Future Report */}
               {isFutureReport && (
                 <ReportSection
                   ref={(el) => (sectionRefs.current['next-steps'] = el)}
                   id="next-steps"
-                  title="Next Steps"
+                  title={isHebrew ? reportCopyHe.reportSections.nextSteps : 'Next Steps'}
                 >
                   {/* What To Do Now & Leakage Risk */}
                   <div
